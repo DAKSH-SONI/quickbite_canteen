@@ -98,102 +98,8 @@
         .glow-button:active {
             transform: scale(0.98);
         }
-        
-        /* --- FOLDING CORNER TOKEN STYLES (Adjusted) --- */
-        .token-button-wrapper {
-            margin: 20px 0;
-            display: flex;
-            justify-content: center;
-        }
-        .token-button {
-            --round: 0.75rem;
-            cursor: pointer;
-            position: relative;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            transition: all 0.25s ease;
-            background: radial-gradient(65.28% 65.28% at 50% 100%, rgba(255, 250, 240, 0.1) 0%, rgba(255, 250, 240, 0) 100%), linear-gradient(0deg, #1f2937, #111827);
-            border-radius: var(--round);
-            border: none;
-            outline: none;
-            padding: 12px 18px;
-            width: 100%;
-            /* ADJUSTMENTS FOR LARGER FRAME */
-            max-width: 400px; 
-            height: 130px; 
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
-        }
-        .token-fold {
-            z-index: 1;
-            position: absolute;
-            top: 0;
-            right: 0;
-            height: 2.5rem; 
-            width: 2.5rem; 
-            display: inline-block;
-            transition: all 0.5s ease-in-out;
-            background: radial-gradient(100% 75% at 55%, var(--primary-color) 0%, rgba(255, 250, 240, 0) 100%);
-            box-shadow: 0 0 5px rgba(0, 0, 0, 0.8);
-            border-bottom-left-radius: 0.5rem;
-            border-top-right-radius: var(--round);
-        }
-        .token-button:hover .token-fold {
-            margin-top: -2.5rem; 
-            margin-right: -2.5rem; 
-        }
-        .token-inner {
-            z-index: 2;
-            gap: 6px;
-            position: relative;
-            width: 100%;
-            color: var(--primary-color);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            font-size: 16px;
-            font-weight: 700;
-            line-height: 1.5;
-            transition: color 0.2s ease-in-out;
-            text-shadow: 0 0 5px rgba(255, 250, 240, 0.5);
-            margin-top: -10px; 
-        }
-        .token-inner .token-id {
-            font-size: 3.5rem; 
-            font-weight: bold;
-        }
-        /* --- END FOLDING CORNER TOKEN STYLES --- */
 
-        /* Profile Image Styles */
-        .profile-pic {
-            width: 4rem;
-            height: 4rem;
-            border-radius: 9999px;
-            background-color: #3b82f6; /* Blue for student/default */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: white;
-            flex-shrink: 0;
-            cursor: pointer; 
-            object-fit: cover;
-            border: 3px solid transparent;
-            transition: border-color 0.3s ease;
-        }
-        .profile-pic:hover {
-            border-color: var(--primary-color);
-        }
-        .profile-pic.faculty {
-            background-color: #f59e0b; /* Amber for faculty/priority */
-        }
-        .profile-pic.owner {
-            background-color: #10b981; /* Emerald for owner */
-        }
-        /* --- STANDARD LOGIN STYLES (Copied from previous file) --- */
+        /* --- USER PROVIDED LOGIN CARD STYLES --- */
         .login-card {
             width: 100%;
             max-width: 320px;
@@ -259,9 +165,78 @@
             color: #5e6681;
             box-shadow: 0 8px 24px 0 rgba(255, 250, 240, 0.8);
         }
-        /* --- END STANDARD LOGIN STYLES --- */
+        
+        /* --- DYNAMIC RADIO BUTTON STYLES (Adapted for 2 options) --- */
+        .radio-container {
+            --main-color: var(--primary-color);
+            --main-color-opacity: #fffae81c;
+            --total-radio: 2; 
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            padding-left: 0.5rem;
+            background-color: var(--login-input-bg);
+            border-radius: 6px;
+        }
+        .radio-container input {
+            cursor: pointer;
+            appearance: none;
+        }
+        .radio-container .glider-container {
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            background: linear-gradient(0deg, rgba(0, 0, 0, 0) 0%, rgba(27, 27, 27, 1) 50%, rgba(0, 0, 0, 0) 100%);
+            width: 1px;
+            border-radius: 6px;
+        }
+        .radio-container .glider-container .glider {
+            position: relative;
+            height: calc(100% / var(--total-radio));
+            width: 100%;
+            background: linear-gradient(0deg, rgba(0, 0, 0, 0) 0%, var(--main-color) 50%, rgba(0, 0, 0, 0) 100%);
+            transition: transform 0.5s cubic-bezier(0.37, 1.95, 0.66, 0.56);
+        }
+        .radio-container .glider-container .glider::before {
+            content: "";
+            position: absolute;
+            height: 60%;
+            width: 300%;
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--main-color);
+            filter: blur(10px);
+        }
+        .radio-container .glider-container .glider::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            height: 100%;
+            width: 150px;
+            background: linear-gradient(90deg, var(--main-color-opacity) 0%, rgba(0, 0, 0, 0) 100%);
+        }
+        .radio-container label {
+            cursor: pointer;
+            padding: 0.75rem 1rem;
+            position: relative;
+            color: #9ca3af;
+            transition: all 0.3s ease-in-out;
+            text-align: left;
+        }
+        .radio-container input:checked + label {
+            color: var(--main-color);
+            font-weight: bold;
+        }
+        .radio-container input:nth-of-type(1):checked ~ .glider-container .glider {
+            transform: translateY(0);
+        }
+        .radio-container input:nth-of-type(2):checked ~ .glider-container .glider {
+            transform: translateY(100%);
+        }
+        /* --- END DYNAMIC RADIO BUTTON STYLES --- */
 
-        /* --- LEADERBOARD & QUANTITY STYLES (Copied from previous file) --- */
+        /* --- LEADERBOARD GLOW BUTTON STYLES (Rainbow) --- */
         .leaderboard-btn-glow {
             position: relative;
             text-decoration: none;
@@ -293,7 +268,178 @@
             z-index: 1;
             padding: 0 10px;
         }
-        /* ... (rest of leaderboard and quantity styles omitted for brevity) ... */
+        .leaderboard-btn-glow:hover span {
+            color: var(--primary-color);
+        }
+        .leaderboard-btn-glow::before,
+        .leaderboard-btn-glow::after {
+            content: "";
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            background-size: 400%;
+            opacity: 0;
+            transition: 0.5s;
+            background: linear-gradient(45deg, #fb0094, #525296, #ff8800, #00f, #fb0094);
+            animation: animate123 10s linear infinite;
+        }
+        .leaderboard-btn-glow::after {
+            filter: blur(20px);
+        }
+        .leaderboard-btn-glow:hover::before,
+        .leaderboard-btn-glow:hover::after {
+            opacity: 1;
+        }
+        @keyframes animate123 {
+            0% { background-position: 0 0; }
+            50% { background-position: 300% 0; }
+            100% { background-position: 0 0; }
+        }
+        /* --- END LEADERBOARD GLOW BUTTON STYLES --- */
+        
+        /* --- FOLDING CORNER TOKEN STYLES (Adapted) --- */
+        .token-button-wrapper {
+            margin: 20px 0;
+            display: flex;
+            justify-content: center;
+        }
+        .token-button {
+            --round: 0.75rem;
+            cursor: pointer;
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            transition: all 0.25s ease;
+            background: radial-gradient(65.28% 65.28% at 50% 100%, rgba(255, 250, 240, 0.1) 0%, rgba(255, 250, 240, 0) 100%), linear-gradient(0deg, #1f2937, #111827);
+            border-radius: var(--round);
+            border: none;
+            outline: none;
+            padding: 12px 18px;
+            width: 100%;
+            /* ADJUSTMENTS FOR LARGER FRAME */
+            max-width: 350px; 
+            height: 110px; /* Increased height to cover 'Your Token' text */
+            /* END ADJUSTMENTS */
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+        }
+        .token-button::before,
+        .token-button::after {
+            content: "";
+            position: absolute;
+            inset: var(--space);
+            transition: all 0.5s ease-in-out;
+            border-radius: calc(var(--round) - var(--space));
+            z-index: 0;
+        }
+        .token-button::before {
+            --space: 1px;
+            background: linear-gradient(177.95deg, rgba(255, 255, 255, 0.19) 0%, rgba(255, 255, 255, 0) 100%);
+        }
+        .token-button::after {
+            --space: 2px;
+            background: radial-gradient(65.28% 65.28% at 50% 100%, rgba(255, 250, 240, 0.1) 0%, rgba(255, 250, 240, 0) 100%), linear-gradient(0deg, #1f2937, #111827);
+        }
+        .token-button:active {
+            transform: scale(0.98);
+        }
+
+        .token-fold {
+            z-index: 1;
+            position: absolute;
+            top: 0;
+            right: 0;
+            /* ADJUSTMENTS FOR LARGER FOLD */
+            height: 2rem; 
+            width: 2rem;
+            /* END ADJUSTMENTS */
+            display: inline-block;
+            transition: all 0.5s ease-in-out;
+            background: radial-gradient(100% 75% at 55%, var(--primary-color) 0%, rgba(255, 250, 240, 0) 100%);
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.8);
+            border-bottom-left-radius: 0.5rem;
+            border-top-right-radius: var(--round);
+        }
+        .token-fold::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 150%;
+            height: 150%;
+            transform: rotate(45deg) translateX(0%) translateY(-24px);
+            background-color: var(--dark-bg);
+            pointer-events: none;
+        }
+        .token-button:hover .token-fold {
+            /* ADJUSTMENTS FOR LARGER FOLD HOVER */
+            margin-top: -2rem; 
+            margin-right: -2rem; 
+            /* END ADJUSTMENTS */
+        }
+
+        .token-points-wrapper {
+            overflow: hidden;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            position: absolute;
+            z-index: 1;
+        }
+        .token-points-wrapper .point {
+            bottom: -10px;
+            position: absolute;
+            animation: floating-points-anim infinite ease-in-out;
+            pointer-events: none;
+            width: 2px;
+            height: 2px;
+            background-color: var(--primary-color);
+            border-radius: 9999px;
+            box-shadow: 0 0 3px var(--primary-color);
+        }
+        @keyframes floating-points-anim {
+            0% { transform: translateY(0); }
+            85% { opacity: 0; }
+            100% { transform: translateY(-70px); opacity: 0; }
+        }
+        /* Specific animations for points are defined in JS below for visibility */
+
+        .token-inner {
+            z-index: 2;
+            gap: 6px;
+            position: relative;
+            width: 100%;
+            color: var(--primary-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: 700;
+            line-height: 1.5;
+            transition: color 0.2s ease-in-out;
+            text-shadow: 0 0 5px rgba(255, 250, 240, 0.5);
+            /* Centering the text vertically within the larger frame */
+            margin-top: -10px; 
+        }
+        .token-inner .token-id {
+            /* ADJUSTMENT for larger text inside the token */
+            font-size: 3rem;
+            /* END ADJUSTMENT */
+            font-weight: bold;
+        }
+        /* --- END FOLDING CORNER TOKEN STYLES --- */
+
+
+        /* --- Other styles --- */
+        .token-display {
+            background: linear-gradient(135deg, #252b35, #1f2937);
+            border-left: 5px solid var(--primary-color);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+        }
 
         .leader-item {
             border-radius: 8px;
@@ -328,12 +474,30 @@
             opacity: 0.3;
             cursor: not-allowed;
         }
+        
+        /* Profile Image Styles */
+        .profile-pic {
+            width: 4rem;
+            height: 4rem;
+            border-radius: 9999px;
+            background-color: #3b82f6; /* Blue for student/default */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: white;
+            flex-shrink: 0;
+        }
+        .profile-pic.faculty {
+            background-color: #f59e0b; /* Amber for faculty/priority */
+        }
+        .profile-pic.owner {
+            background-color: #10b981; /* Emerald for owner */
+        }
     </style>
 </head>
 <body onload="setView('login')">
-
-    <!-- Hidden file input for profile picture upload -->
-    <input type="file" id="profile-upload" accept="image/*" class="hidden" onchange="handleProfileImage(event)">
 
     <!-- Loading Overlay -->
     <div id="loading-overlay" class="loading hidden">
@@ -391,8 +555,6 @@
                 // Owner User
                 'O100': { id: 'O100', name: 'Canteen Owner', role: 'Owner', token: 'O-100', udhar: 0, ordersPlaced: 0, isPriority: false, isLoggedIn: true }
             },
-            // Mock storage for user-uploaded profile picture data URLs
-            userProfiles: {}, 
             currentUserId: null, 
 
             menu: [
@@ -590,50 +752,8 @@
             showMessage('You have been logged out.', 'info');
             setView('login');
         }
-        
-        // --- PROFILE PICTURE LOGIC ---
 
-        function setProfilePicture() {
-            // Trigger the hidden file input click
-            document.getElementById('profile-upload').click();
-        }
-
-        function handleProfileImage(event) {
-            const file = event.target.files[0];
-            const userId = APP_STATE.currentUserId;
-            if (file && userId) {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    // Store the image data URL
-                    APP_STATE.userProfiles[userId] = e.target.result;
-                    showMessage("Profile picture updated!", 'success');
-                    // Re-render the current view to show the new picture
-                    // Check if the current view is order or account before re-rendering
-                    const currentView = document.getElementById('view-container').innerHTML.includes('Order Cart') ? 'order' : 'account';
-                    setView(currentView); 
-                };
-                reader.readAsDataURL(file);
-            }
-        }
-        
-        function getInitials(name) {
-            if (!name) return '??';
-            return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
-        }
-
-        function getProfileHtml(user) {
-            const profileUrl = APP_STATE.userProfiles[user.id];
-            const initials = getInitials(user.name);
-            const userRoleClass = user.role === 'Faculty' ? 'faculty' : (user.role === 'Owner' ? 'owner' : '');
-            
-            if (profileUrl) {
-                return `<img src="${profileUrl}" alt="${user.name}" class="profile-pic ${userRoleClass}" onclick="setProfilePicture()">`;
-            } else {
-                return `<div class="profile-pic ${userRoleClass}" onclick="setProfilePicture()">${initials}</div>`;
-            }
-        }
-
-        // --- ORDERING LOGIC (omitted for brevity) ---
+        // --- ORDERING LOGIC ---
         
         function addToCart(itemId) {
             const item = APP_STATE.menu.find(i => i.id === itemId);
@@ -766,7 +886,7 @@
             setView('queue'); 
         }
 
-        // --- CANCELLATION & OWNER FUNCTIONS (omitted for brevity) ---
+        // --- CUSTOMER ORDER CANCELLATION ---
 
         function cancelItemFromOrder(orderId, itemName) {
             const orderIndex = APP_STATE.orderQueue.findIndex(o => o.id === orderId);
@@ -843,6 +963,8 @@
             setView('queue');
         }
 
+        // --- OWNER FUNCTIONS ---
+
         function updateOrderStatus(orderId, newStatus) {
             const order = APP_STATE.orderQueue.find(o => o.id === orderId);
             if (order) {
@@ -890,6 +1012,12 @@
             if (!user) return;
             // Clear dues logic is now consolidated in clearDues function
             clearDues(user.token);
+        }
+        
+        // Utility to get initials for profile pic
+        function getInitials(name) {
+            if (!name) return '??';
+            return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
         }
 
         // --- UI RENDERING FUNCTIONS ---
@@ -999,7 +1127,7 @@
                 <!-- User Info Panel -->
                 <div class="canteen-card p-6 lg:col-span-1 h-fit">
                     <div class="flex items-center mb-4 border-b border-gray-700 pb-4">
-                        ${getProfileHtml(user)}
+                        <div class="profile-pic ${userRoleClass}">${getInitials(user.name)}</div>
                         <div class="ml-4">
                             <h3 class="text-2xl font-bold flex items-center">
                                 ${user.name}
@@ -1224,7 +1352,7 @@
                 
                 <div class="canteen-card p-6 mb-6 space-y-3">
                     <div class="flex items-center border-b border-gray-700 pb-4 mb-4">
-                        ${getProfileHtml(user)}
+                        <div class="profile-pic ${userRoleClass}">${getInitials(user.name)}</div>
                         <div class="ml-4">
                             <span class="text-gray-400 flex items-center mb-1"><i data-lucide="user-check" class="w-5 h-5 mr-2"></i> User:</span>
                             <span class="font-semibold text-lg">${user.name} (${user.id})</span>

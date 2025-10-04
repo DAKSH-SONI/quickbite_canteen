@@ -517,7 +517,8 @@
         </header>
 
         <!-- Dynamic View Container -->
-        <div id="view-container" class="transition-all duration-500 pb-20 md:pb-10">
+        <!-- Added extra padding to ensure content is visible above the fixed navbar -->
+        <div id="view-container" class="transition-all duration-500 pb-20 md:pb-24"> 
             <!-- Content will be injected here -->
         </div>
 
@@ -555,6 +556,8 @@
                 // Owner User
                 'O100': { id: 'O100', name: 'Canteen Owner', role: 'Owner', token: 'O-100', udhar: 0, ordersPlaced: 0, isPriority: false, isLoggedIn: true }
             },
+            // Mock storage for user-uploaded profile picture data URLs
+            userProfiles: {}, 
             currentUserId: null, 
 
             menu: [
@@ -751,6 +754,52 @@
             cart = []; 
             showMessage('You have been logged out.', 'info');
             setView('login');
+        }
+        
+        // --- PROFILE PICTURE LOGIC ---
+
+        function setProfilePicture() {
+            // Trigger the hidden file input click
+            document.getElementById('profile-upload').click();
+        }
+
+        function handleProfileImage(event) {
+            const file = event.target.files[0];
+            const userId = APP_STATE.currentUserId;
+            if (file && userId) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    // Store the image data URL
+                    APP_STATE.userProfiles[userId] = e.target.result;
+                    showMessage("Profile picture updated!", 'success');
+                    // Re-render the current view to show the new picture
+                    // Determine current view name
+                    const viewContainer = document.getElementById('view-container');
+                    let currentViewName = 'order'; // Default to order
+                    if (viewContainer.innerHTML.includes('Account & Settings')) {
+                        currentViewName = 'account';
+                    }
+                    setView(currentViewName); 
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+        
+        function getInitials(name) {
+            if (!name) return '??';
+            return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+        }
+
+        function getProfileHtml(user) {
+            const profileUrl = APP_STATE.userProfiles[user.id];
+            const initials = getInitials(user.name);
+            const userRoleClass = user.role === 'Faculty' ? 'faculty' : (user.role === 'Owner' ? 'owner' : '');
+            
+            if (profileUrl) {
+                return `<img src="${profileUrl}" alt="${user.name}" class="profile-pic ${userRoleClass}" onclick="setProfilePicture()">`;
+            } else {
+                return `<div class="profile-pic ${userRoleClass}" onclick="setProfilePicture()">${initials}</div>`;
+            }
         }
 
         // --- ORDERING LOGIC ---
@@ -1352,7 +1401,7 @@
                 
                 <div class="canteen-card p-6 mb-6 space-y-3">
                     <div class="flex items-center border-b border-gray-700 pb-4 mb-4">
-                        <div class="profile-pic ${userRoleClass}">${getInitials(user.name)}</div>
+                        ${getProfileHtml(user)}
                         <div class="ml-4">
                             <span class="text-gray-400 flex items-center mb-1"><i data-lucide="user-check" class="w-5 h-5 mr-2"></i> User:</span>
                             <span class="font-semibold text-lg">${user.name} (${user.id})</span>
@@ -1380,8 +1429,9 @@
                     </button>
                 </div>
                 
-                <button onclick="logout()" class="w-full py-2 text-sm text-red-400 hover:text-red-300 transition-colors mt-4">
-                    Logout
+                <!-- MOVED LOGOUT INTO A CARD-STYLE BUTTON FOR BETTER VISUAL HIERARCHY -->
+                <button onclick="logout()" class="login-btn w-full py-2 text-sm bg-red-600 hover:bg-red-500" style="--primary-color: #F87171;">
+                    <i data-lucide="log-out" class="w-5 h-5 mr-2 inline-block"></i> Logout
                 </button>
             </div>
             `;

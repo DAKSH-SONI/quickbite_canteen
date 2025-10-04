@@ -1,12 +1,18 @@
+I see you're ready for the final code update\!
+
+Here is the complete, definitive single-file application for the **QuickBite - Dynamic Canteen Order System**. This version incorporates all the major features, including the expanded animated token bar, the intelligent queue system, the split Login/Registration flow, and the accessible Logout button.
+
+You can copy and paste this entire code block into an `.html` file to run the complete web application.
+
+```html:quickbite - Dynamic Canteen Order System:index.html
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QuickBites - Dynamic Canteen Order System</title>
+    <title>QuickBite - Dynamic Canteen Order System</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Times+New+Roman:wght@400;700&display=swap" rel="stylesheet">
-    <!-- Icons from Lucide -->
     <script src="https://unpkg.com/lucide@latest"></script>
 
     <style>
@@ -320,11 +326,10 @@
             outline: none;
             padding: 12px 18px;
             width: 100%;
-            /* ADJUSTMENTS FOR LARGER FRAME */
-            max-width: 350px; 
-            height: 110px; /* Increased height to cover 'Your Token' text */
-            /* END ADJUSTMENTS */
+            max-width: 300px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+            /* INCREASED HEIGHT */
+            height: 110px; 
         }
         .token-button::before,
         .token-button::after {
@@ -352,10 +357,9 @@
             position: absolute;
             top: 0;
             right: 0;
-            /* ADJUSTMENTS FOR LARGER FOLD */
+            /* Adjusted size for new height */
             height: 2rem; 
-            width: 2rem;
-            /* END ADJUSTMENTS */
+            width: 2rem; 
             display: inline-block;
             transition: all 0.5s ease-in-out;
             background: radial-gradient(100% 75% at 55%, var(--primary-color) 0%, rgba(255, 250, 240, 0) 100%);
@@ -370,15 +374,13 @@
             right: 0;
             width: 150%;
             height: 150%;
-            transform: rotate(45deg) translateX(0%) translateY(-24px);
+            transform: rotate(45deg) translateX(0%) translateY(-32px); /* Adjusted translation */
             background-color: var(--dark-bg);
             pointer-events: none;
         }
         .token-button:hover .token-fold {
-            /* ADJUSTMENTS FOR LARGER FOLD HOVER */
-            margin-top: -2rem; 
-            margin-right: -2rem; 
-            /* END ADJUSTMENTS */
+            margin-top: -2rem; /* Adjusted margin */
+            margin-right: -2rem; /* Adjusted margin */
         }
 
         .token-points-wrapper {
@@ -403,7 +405,7 @@
         @keyframes floating-points-anim {
             0% { transform: translateY(0); }
             85% { opacity: 0; }
-            100% { transform: translateY(-70px); opacity: 0; }
+            100% { transform: translateY(-100px); opacity: 0; } /* Adjusted travel distance */
         }
         /* Specific animations for points are defined in JS below for visibility */
 
@@ -422,13 +424,10 @@
             line-height: 1.5;
             transition: color 0.2s ease-in-out;
             text-shadow: 0 0 5px rgba(255, 250, 240, 0.5);
-            /* Centering the text vertically within the larger frame */
-            margin-top: -10px; 
         }
         .token-inner .token-id {
-            /* ADJUSTMENT for larger text inside the token */
-            font-size: 3rem;
-            /* END ADJUSTMENT */
+            /* INCREASED FONT SIZE */
+            font-size: 3rem; 
             font-weight: bold;
         }
         /* --- END FOLDING CORNER TOKEN STYLES --- */
@@ -454,6 +453,7 @@
 
         .icon-container {
             transition: all 0.3s ease;
+            cursor: pointer;
         }
         .icon-container:hover {
             color: var(--primary-color);
@@ -475,31 +475,32 @@
             cursor: not-allowed;
         }
         
-        /* Profile Image Styles */
-        .profile-pic {
-            width: 4rem;
-            height: 4rem;
-            border-radius: 9999px;
-            background-color: #3b82f6; /* Blue for student/default */
+        /* New Login/Register Button Group */
+        .toggle-btn-group {
             display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
+            background: var(--login-input-bg);
+            border-radius: 6px;
+            padding: 4px;
+            margin-bottom: 1.5rem;
+        }
+        .toggle-btn {
+            flex-grow: 1;
+            padding: 0.5rem;
+            border-radius: 4px;
             font-weight: bold;
-            color: white;
-            flex-shrink: 0;
+            color: #9ca3af;
+            transition: all 0.3s ease;
+            cursor: pointer;
         }
-        .profile-pic.faculty {
-            background-color: #f59e0b; /* Amber for faculty/priority */
-        }
-        .profile-pic.owner {
-            background-color: #10b981; /* Emerald for owner */
+        .toggle-btn.active {
+            background: var(--dark-bg);
+            color: var(--primary-color);
+            box-shadow: 0 1px 5px rgba(0, 0, 0, 0.5);
         }
     </style>
 </head>
 <body onload="setView('login')">
 
-    <!-- Loading Overlay -->
     <div id="loading-overlay" class="loading hidden">
         <svg height="48px" width="64px">
             <polyline id="back" points="0.157 23.954, 14 23.954, 21.843 48, 43 0, 50 24, 64 24"></polyline>
@@ -508,22 +509,17 @@
     </div>
 
     <div id="app" class="w-full max-w-5xl">
-        <!-- Main Content Area -->
         <header class="text-center mb-8">
             <h1 class="text-5xl font-bold tracking-widest text-white mb-2" style="text-shadow: 0 0 10px var(--primary-color);">
-                QUICKBITES
+                QUICKBITE
             </h1>
             <p class="text-gray-400 text-lg">Smart Canteen Order System</p>
         </header>
 
-        <!-- Dynamic View Container -->
-        <!-- Added extra padding to ensure content is visible above the fixed navbar -->
-        <div id="view-container" class="transition-all duration-500 pb-20 md:pb-24"> 
-            <!-- Content will be injected here -->
-        </div>
+        <div id="view-container" class="transition-all duration-500 pb-20 md:pb-10">
+            </div>
 
-        <!-- Navigation Bar (Hidden on login/owner views, controlled by setView logic) -->
-        <nav id="navbar" class="fixed bottom-0 left-0 right-0 p-4 bg-gray-900 border-t border-gray-700 shadow-2xl z-50 hidden">
+        <nav id="nav-bar" class="fixed bottom-0 left-0 right-0 p-4 bg-gray-900 border-t border-gray-700 shadow-2xl z-50 hidden">
             <div class="flex justify-around max-w-xl mx-auto">
                 <button onclick="setView('order')" class="icon-container flex flex-col items-center text-sm p-2 rounded-lg text-gray-400 hover:text-white transition-colors">
                     <i data-lucide="utensils" class="w-6 h-6 mb-1"></i>
@@ -550,14 +546,11 @@
 
         const APP_STATE = {
             users: {
-                // Customer/Student/Faculty Users
-                'F101': { id: 'F101', name: 'Dr. Jane Smith', role: 'Faculty', token: 'F-101', udhar: 450, ordersPlaced: 55, isPriority: true, isLoggedIn: true },
-                'S503': { id: 'S503', name: 'Aarav Sharma', role: 'Student', token: 'S-503', udhar: 120, ordersPlaced: 92, isPriority: false, isLoggedIn: true },
-                // Owner User
-                'O100': { id: 'O100', name: 'Canteen Owner', role: 'Owner', token: 'O-100', udhar: 0, ordersPlaced: 0, isPriority: false, isLoggedIn: true }
+                // Default registered users for testing
+                'S101': { id: 'S101', name: 'Aarav Sharma', college: 'Gits', token: 'S-101', password: '123', role: 'Student', udhar: 120, ordersPlaced: 92, isPriority: false, isLoggedIn: true },
+                'F101': { id: 'F101', name: 'Dr. Jane Smith', college: 'Gits', token: 'F-101', password: '123', role: 'Faculty', udhar: 450, ordersPlaced: 55, isPriority: true, isLoggedIn: true },
+                'O100': { id: 'O100', name: 'Canteen Owner', canteen: 'QuickBite', token: 'O-100', password: '123', role: 'Owner', udhar: 0, ordersPlaced: 0, isPriority: false, isLoggedIn: true }
             },
-            // Mock storage for user-uploaded profile picture data URLs
-            userProfiles: {}, 
             currentUserId: null, 
 
             menu: [
@@ -572,6 +565,8 @@
 
                 // Standard Prep Items (2 minutes)
                 { id: 'tea', name: 'Masala Tea', price: 15, stock: 99, prepTime: 2, category: 'drink' },
+                { id: 'coffee', name: 'Cold Coffee', price: 60, stock: 12, prepTime: 2, category: 'drink' },
+                { id: 'thali', name: 'Veg Thali', price: 100, stock: 4, prepTime: 2, category: 'meal' },
                 { id: 'sandwich', name: 'Grilled Sandwich', price: 75, stock: 0, prepTime: 2, category: 'cooked' },
 
                 // Packaged/Instant Items (0 minutes)
@@ -582,9 +577,10 @@
             ],
 
             orderQueue: [
-                { id: 'Q1', token: 'S-503', items: [{ name: 'Masala Tea', quantity: 1, price: 15, prepTime: 2 }], status: 'In Prep', eta: '10:45 AM', total: 15 },
-                { id: 'Q2', token: 'F-101', items: [{ name: 'Samosa', quantity: 2, price: 20, prepTime: 0.5 }], status: 'Ready', eta: '10:40 AM', total: 40 },
-                { id: 'Q3', token: 'S-210', items: [{ name: 'Maggi', quantity: 1, price: 50, prepTime: 10 }], status: 'Queued', eta: '10:50 AM', total: 50 },
+                // Initial orders (must have scheduledPickupTimeMs)
+                { id: 'Q1', token: 'S-503', items: [{ name: 'Tea', quantity: 1, price: 15, prepTime: 2 }], status: 'In Prep', eta: '10:45 AM', total: 15, scheduledPickupTimeMs: Date.now() + 5 * 60 * 1000 },
+                { id: 'Q2', token: 'F-101', items: [{ name: 'Samosa', quantity: 2, price: 20, prepTime: 0.5 }], status: 'Ready', eta: '10:40 AM', total: 40, scheduledPickupTimeMs: Date.now() + 10 * 60 * 1000 },
+                { id: 'Q3', token: 'S-210', items: [{ name: 'Maggi', quantity: 1, price: 50, prepTime: 10 }], status: 'Queued', eta: '10:50 AM', total: 50, scheduledPickupTimeMs: Date.now() + 20 * 60 * 1000 },
             ],
 
             cancelledOrders: [
@@ -592,18 +588,15 @@
             ],
 
             udharLedger: {
-                'S-503': 120,
+                'S-101': 120,
                 'F-101': 450,
                 'S-210': 30,
                 'O-100': 0,
-            },
-
-            ownerNotifications: [
-                // { id: 'N1', type: 'udhar_cleared', token: 'F-101', amount: 450, timestamp: new Date().toLocaleTimeString() }
-            ]
+            }
         };
 
         let cart = [];
+        let currentAuthMode = 'login'; // 'login' or 'register'
 
         // --- UTILITY & VIEW SWITCHING ---
 
@@ -624,15 +617,9 @@
             document.getElementById('loading-overlay').classList.add('hidden');
         }
 
-        function toggleNavbar(show) {
-            const navbar = document.getElementById('navbar');
-            if (navbar) {
-                if (show) {
-                    navbar.classList.remove('hidden');
-                } else {
-                    navbar.classList.add('hidden');
-                }
-            }
+        function setAuthMode(mode) {
+            currentAuthMode = mode;
+            setView('login');
         }
 
         function setView(viewName) {
@@ -640,24 +627,26 @@
             
             let finalView = viewName;
             const user = APP_STATE.users[APP_STATE.currentUserId];
+            const navBar = document.getElementById('nav-bar');
 
             // Handle unauthorized access or logout
             if (viewName !== 'login') {
                 if (!user) {
                     finalView = 'login';
-                    toggleNavbar(false);
-                } else if (user.role === 'Owner') {
+                } else if (user.role === 'Owner' && viewName !== 'owner') {
                     finalView = 'owner';
-                    toggleNavbar(false);
                 } else if (user.role !== 'Owner' && viewName === 'owner') {
                     finalView = 'order'; // Redirect regular users away from owner page
-                    toggleNavbar(true);
-                } else {
-                    toggleNavbar(true); // Show navbar for regular user views
                 }
-            } else {
-                toggleNavbar(false); // Hide navbar on login
             }
+
+            // --- NAVIGATION BAR VISIBILITY CONTROL ---
+            if (finalView === 'login') {
+                navBar.classList.add('hidden');
+            } else {
+                navBar.classList.remove('hidden');
+            }
+            // --- END CONTROL ---
             
             // Allow a brief animation before rendering
             setTimeout(() => {
@@ -672,11 +661,6 @@
 
                 lucide.createIcons();
                 hideLoader();
-
-                // Re-run updateCartUI if we are on the order page to initialize cart visuals
-                if (finalView === 'order') {
-                    updateCartUI(); 
-                }
             }, 300); // 300ms delay for loading animation
         }
 
@@ -704,102 +688,96 @@
         
         // --- AUTHENTICATION / REGISTRATION ---
 
-        function login() {
-            const id = document.getElementById('loginId').value.trim();
+        function handleAuth() {
             const role = document.querySelector('input[name="userRole"]:checked')?.value;
-            
-            if (!id || !role) {
-                showMessage('Please enter your ID and select a role.', 'error');
-                return;
-            }
+            const password = document.getElementById('password').value.trim();
 
-            const userExists = APP_STATE.users[id];
-
-            if (!userExists) {
-                const token = (role === 'Owner' ? 'O' : (role === 'Faculty' ? 'F' : 'S')) + Math.floor(Math.random() * 900 + 100);
-                const newUser = {
-                    id: id,
-                    name: id,
-                    role: role,
-                    token: token,
-                    udhar: 0,
-                    ordersPlaced: 0,
-                    isPriority: role === 'Faculty',
-                    isLoggedIn: true
-                };
-                APP_STATE.users[id] = newUser;
-                APP_STATE.udharLedger[token] = 0;
-                APP_STATE.currentUserId = id;
-                showMessage(`Welcome! Your new token is ${token}.`, 'success');
+            if (currentAuthMode === 'register') {
+                handleRegistration(role, password);
             } else {
-                // Simple role check for existing users
-                if (userExists.role !== role) {
-                    showMessage(`ID ${id} is registered as ${userExists.role}. Please select the correct role.`, 'error');
-                    return;
+                handleLogin(role, password);
+            }
+        }
+
+        function handleRegistration(role, password) {
+            let id, name, token, extraField;
+
+            if (role === 'Student') {
+                id = document.getElementById('rollNumber').value.trim();
+                name = document.getElementById('studentName').value.trim();
+                extraField = document.getElementById('collegeName').value.trim(); // College Name
+                token = 'S-' + id;
+                if (!id || !name || !password || !extraField) {
+                    return showMessage('Please fill all registration fields (Name, Roll Number, College, Password).', 'error');
                 }
-                APP_STATE.currentUserId = id;
-                showMessage(`Welcome back, ${userExists.name}!`, 'success');
+            } else { // Owner
+                id = 'O100'; // Default Owner ID
+                name = document.getElementById('canteenName').value.trim();
+                token = 'O-100';
+                if (!name || !password) {
+                    return showMessage('Please fill all registration fields (Canteen Name, Password).', 'error');
+                }
             }
             
-            if (APP_STATE.users[APP_STATE.currentUserId].role === 'Owner') {
-                setView('owner');
-            } else {
-                setView('order');
+            if (APP_STATE.users[id]) {
+                return showMessage(`Error: Account with ID ${id} already exists. Please login.`, 'error');
             }
+
+            const newUser = {
+                id: id,
+                name: name,
+                college: role === 'Student' ? extraField : undefined,
+                canteen: role === 'Owner' ? name : undefined,
+                token: token,
+                password: password,
+                role: role,
+                udhar: 0,
+                ordersPlaced: 0,
+                isPriority: role === 'Faculty', // Placeholder, but functional for future use
+                isLoggedIn: true
+            };
+            
+            APP_STATE.users[id] = newUser;
+            APP_STATE.udharLedger[token] = 0;
+            APP_STATE.currentUserId = id;
+
+            showMessage(`Registration successful! Your token is ${token}.`, 'success');
+            setView(role === 'Owner' ? 'owner' : 'order');
+        }
+
+        function handleLogin(role, password) {
+            let id;
+
+            if (role === 'Student') {
+                id = document.getElementById('rollNumberLogin').value.trim();
+                if (!id || !password) {
+                    return showMessage('Please enter your Roll Number and Password.', 'error');
+                }
+            } else { // Owner
+                id = document.getElementById('ownerId').value.trim();
+                if (id !== 'O100') {
+                     return showMessage('Invalid Owner ID. The required ID is O100.', 'error');
+                }
+                if (!id || !password) {
+                    return showMessage('Please enter your Owner ID (O100) and Password.', 'error');
+                }
+            }
+            
+            const user = APP_STATE.users[id];
+
+            if (!user || user.password !== password || user.role !== role) {
+                return showMessage('Login failed: Invalid ID/Roll Number or Password.', 'error');
+            }
+
+            APP_STATE.currentUserId = id;
+            showMessage(`Welcome back, ${user.name}!`, 'success');
+            setView(user.role === 'Owner' ? 'owner' : 'order');
         }
         
         function logout() {
             APP_STATE.currentUserId = null;
-            // Clear cart on logout
-            cart = []; 
             showMessage('You have been logged out.', 'info');
-            setView('login');
-        }
-        
-        // --- PROFILE PICTURE LOGIC ---
-
-        function setProfilePicture() {
-            // Trigger the hidden file input click
-            document.getElementById('profile-upload').click();
-        }
-
-        function handleProfileImage(event) {
-            const file = event.target.files[0];
-            const userId = APP_STATE.currentUserId;
-            if (file && userId) {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    // Store the image data URL
-                    APP_STATE.userProfiles[userId] = e.target.result;
-                    showMessage("Profile picture updated!", 'success');
-                    // Re-render the current view to show the new picture
-                    // Determine current view name
-                    const viewContainer = document.getElementById('view-container');
-                    let currentViewName = 'order'; // Default to order
-                    if (viewContainer.innerHTML.includes('Account & Settings')) {
-                        currentViewName = 'account';
-                    }
-                    setView(currentViewName); 
-                };
-                reader.readAsDataURL(file);
-            }
-        }
-        
-        function getInitials(name) {
-            if (!name) return '??';
-            return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
-        }
-
-        function getProfileHtml(user) {
-            const profileUrl = APP_STATE.userProfiles[user.id];
-            const initials = getInitials(user.name);
-            const userRoleClass = user.role === 'Faculty' ? 'faculty' : (user.role === 'Owner' ? 'owner' : '');
-            
-            if (profileUrl) {
-                return `<img src="${profileUrl}" alt="${user.name}" class="profile-pic ${userRoleClass}" onclick="setProfilePicture()">`;
-            } else {
-                return `<div class="profile-pic ${userRoleClass}" onclick="setProfilePicture()">${initials}</div>`;
-            }
+            setAuthMode('login'); // Always default to login view after logout
         }
 
         // --- ORDERING LOGIC ---
@@ -809,12 +787,7 @@
             if (item && item.stock > 0) {
                 const cartItem = cart.find(c => c.id === itemId);
                 if (cartItem) {
-                    if (cartItem.quantity < item.stock) {
-                        cartItem.quantity++;
-                    } else {
-                        showMessage(`Cannot add more: only ${item.stock} of ${item.name} remaining.`, 'error');
-                        return;
-                    }
+                    cartItem.quantity++;
                 } else {
                     cart.push({ ...item, quantity: 1 });
                 }
@@ -828,9 +801,9 @@
         function removeFromCart(itemId) {
             const cartItemIndex = cart.findIndex(c => c.id === itemId);
             if (cartItemIndex !== -1) {
-                const item = cart[cartItemIndex];
-                item.quantity--;
-                if (item.quantity <= 0) {
+                const cartItem = cart[cartItemIndex];
+                cartItem.quantity--;
+                if (cartItem.quantity <= 0) {
                     cart.splice(cartItemIndex, 1);
                 }
             }
@@ -838,16 +811,13 @@
         }
         
         function updateCartUI() {
-            // Function runs only if the Order view elements exist
             const cartItemsContainer = document.getElementById('cart-items');
             const cartTotalSpan = document.getElementById('cart-total');
             const placeOrderBtn = document.getElementById('place-order-btn');
-
-            if (!cartItemsContainer || !cartTotalSpan || !placeOrderBtn) return;
             
             let total = 0;
             if (cart.length === 0) {
-                cartItemsContainer.innerHTML = '<div class="text-gray-500 py-4">Cart is empty. Add items above.</div>';
+                cartItemsContainer.innerHTML = 'Cart is empty. Add items above.';
                 cartTotalSpan.textContent = '₹0';
                 placeOrderBtn.disabled = true;
                 return;
@@ -892,17 +862,44 @@
             });
 
             // 2. Queueing Logic (Dynamic Time Slot Calculation)
-            let totalPrepTime = 0;
+            let totalPrepTimeMinutes = 0;
             orderItemsDetail.forEach(item => {
-                totalPrepTime += item.prepTime * item.quantity;
+                totalPrepTimeMinutes += item.prepTime * item.quantity;
             });
 
-            const baseWaitTime = user.isPriority ? 2 : 5; // Base wait time in minutes
-            const totalWait = baseWaitTime + totalPrepTime;
+            // --- Dynamic Queue Logic: Only consider items still in 'Queued' or 'In Prep' status ---
+            const activeOrders = APP_STATE.orderQueue.filter(o => o.status === 'Queued' || o.status === 'In Prep');
+            
+            // Find the scheduled finish time of the latest active order
+            const latestOrderFinishTimeMs = activeOrders.reduce((latestTime, order) => {
+                return Math.max(latestTime, order.scheduledPickupTimeMs || 0);
+            }, Date.now()); // Start comparison from now
 
-            const etaDate = new Date();
-            etaDate.setMinutes(etaDate.getMinutes() + totalWait);
+            const baseWaitTimeMinutes = user.isPriority ? 2 : 5; // Base delay for order hand-off/queue processing
+            
+            // New order starts when the latest previous order finishes OR now (whichever is later) + base delay
+            let startTimeMs = latestOrderFinishTimeMs;
+
+            if (startTimeMs < Date.now()) {
+                startTimeMs = Date.now();
+            }
+
+            // Schedule start time (incorporating buffer)
+            startTimeMs += (baseWaitTimeMinutes * 60 * 1000);
+            
+            // Calculate final scheduled pickup time
+            const prepTimeMs = totalPrepTimeMinutes * 60 * 1000;
+            const scheduledPickupTimeMs = startTimeMs + prepTimeMs;
+            
+            const etaDate = new Date(scheduledPickupTimeMs);
             const etaString = etaDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+            
+            // Calculate the total wait time from NOW until pickup for display
+            const totalWaitMs = scheduledPickupTimeMs - Date.now();
+            const totalWaitMinutes = Math.floor(totalWaitMs / (60 * 1000));
+            const totalWaitSeconds = Math.ceil((totalWaitMs % (60 * 1000)) / 1000);
+            const displayWaitTime = `${totalWaitMinutes} min ${totalWaitSeconds} sec`;
+
 
             // 3. Udhar Option (Simulated: Auto-credit if large order)
             const totalAmount = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
@@ -922,7 +919,8 @@
                 items: orderItemsDetail,
                 status: 'Queued',
                 eta: etaString,
-                total: finalAmount
+                total: finalAmount,
+                scheduledPickupTimeMs: scheduledPickupTimeMs // Store for next calculation
             });
 
             // 5. Update User Stats
@@ -931,27 +929,23 @@
             // 6. Clear Cart & Show Success
             cart = [];
             
-            showMessage(`Order Placed! Token: **${user.token}**. Pickup time: **${etaString}** (${paymentNote})`, 'success');
+            showMessage(`Order Placed! Token: **${user.token}**. Wait Time: **${displayWaitTime}**. Pickup: **${etaString}** (${paymentNote})`, 'success');
             setView('queue'); 
         }
 
-        // --- CUSTOMER ORDER CANCELLATION ---
+        // --- CUSTOMER ORDER CANCELLATION & OWNER FUNCTIONS remain the same as previous version ---
 
         function cancelItemFromOrder(orderId, itemName) {
             const orderIndex = APP_STATE.orderQueue.findIndex(o => o.id === orderId);
             if (orderIndex === -1) return showMessage('Order not found.', 'error');
 
             const order = APP_STATE.orderQueue[orderIndex];
-            if (order.status === 'Ready') {
-                return showMessage('Cannot modify: Order is already READY for pickup!', 'error');
-            }
-            
             const itemIndex = order.items.findIndex(i => i.name === itemName);
             if (itemIndex === -1) return showMessage('Item not found in order.', 'error');
             
             const cancelledItem = order.items[itemIndex];
             
-            // 1. Restore Stock (Find item by name in the menu)
+            // 1. Restore Stock
             const menuItem = APP_STATE.menu.find(m => m.name === itemName);
             if (menuItem) menuItem.stock += cancelledItem.quantity;
 
@@ -972,12 +966,12 @@
             // 4. If order is empty, remove the whole order
             if (order.items.length === 0) {
                 APP_STATE.orderQueue.splice(orderIndex, 1);
-                showMessage(`Order #${order.token} cancelled entirely as it was empty.`, 'info');
-            } else {
-                showMessage(`${itemName} cancelled from order #${order.token}.`, 'info');
+                showMessage(`Order #${order.token} cancelled entirely.`, 'info');
+                setView('queue');
+                return;
             }
 
-            // Re-render the queue view to update status
+            showMessage(`${itemName} cancelled from order #${order.token}.`, 'info');
             setView('queue');
         }
 
@@ -1012,12 +1006,19 @@
             setView('queue');
         }
 
-        // --- OWNER FUNCTIONS ---
-
         function updateOrderStatus(orderId, newStatus) {
             const order = APP_STATE.orderQueue.find(o => o.id === orderId);
             if (order) {
                 order.status = newStatus;
+                
+                // If order is completed, remove it from the active queue and update stats
+                if (newStatus === 'Complete') {
+                    const index = APP_STATE.orderQueue.findIndex(o => o.id === orderId);
+                    if (index !== -1) {
+                         APP_STATE.orderQueue.splice(index, 1);
+                    }
+                }
+                
                 showMessage(`Order #${order.token} status updated to ${newStatus}.`, 'success');
                 setView('owner');
             }
@@ -1036,21 +1037,8 @@
             const amount = APP_STATE.udharLedger[token] || 0;
             if (amount > 0) {
                 APP_STATE.udharLedger[token] = 0;
-                
-                // 1. Notify Owner (Simulated)
-                const user = Object.values(APP_STATE.users).find(u => u.token === token);
-                const notification = {
-                    id: 'N' + (APP_STATE.ownerNotifications.length + 1),
-                    type: 'udhar_cleared',
-                    token: token,
-                    name: user ? user.name : 'Unknown User',
-                    amount: amount,
-                    timestamp: new Date().toLocaleTimeString()
-                };
-                APP_STATE.ownerNotifications.push(notification);
-
                 showMessage(`Dues of ₹${amount} for Token ${token} cleared successfully!`, 'success');
-                setView(APP_STATE.users[APP_STATE.currentUserId].role === 'Owner' ? 'owner' : 'account');
+                setView('owner');
             } else {
                 showMessage(`Token ${token} has no outstanding dues.`, 'info');
             }
@@ -1059,51 +1047,108 @@
         function clearUdhar() { // Customer side function
             const user = APP_STATE.users[APP_STATE.currentUserId];
             if (!user) return;
-            // Clear dues logic is now consolidated in clearDues function
-            clearDues(user.token);
-        }
-        
-        // Utility to get initials for profile pic
-        function getInitials(name) {
-            if (!name) return '??';
-            return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+            const amount = APP_STATE.udharLedger[user.token] || 0;
+            if (amount > 0) {
+                APP_STATE.udharLedger[user.token] = 0;
+                showMessage(`Dues of ₹${amount} cleared successfully!`, 'success');
+                setView('account');
+            } else {
+                showMessage('You have no outstanding dues!', 'info');
+            }
         }
 
         // --- UI RENDERING FUNCTIONS ---
         
         function renderLogin() {
+            const isLogin = currentAuthMode === 'login';
+
+            let formFields = '';
+            let submitText = isLogin ? 'Login' : 'Register';
+            let roleSpecificFields = '';
+
+            const selectedRole = document.querySelector('input[name="userRole"]:checked')?.value || 'Student';
+
+            if (selectedRole === 'Student') {
+                if (isLogin) {
+                    roleSpecificFields = `
+                        <div class="login-field">
+                            <i data-lucide="hash" class="input-icon"></i>
+                            <input autocomplete="off" id="rollNumberLogin" placeholder="Roll Number (Your ID)" class="input-field" type="text" required> 
+                        </div>
+                    `;
+                } else { // Register
+                    roleSpecificFields = `
+                        <div class="login-field">
+                            <i data-lucide="building-2" class="input-icon"></i>
+                            <input autocomplete="off" id="collegeName" placeholder="College Name" class="input-field" type="text" required>
+                        </div>
+                        <div class="login-field">
+                            <i data-lucide="user" class="input-icon"></i>
+                            <input autocomplete="off" id="studentName" placeholder="Name" class="input-field" type="text" required> 
+                        </div>
+                        <div class="login-field">
+                            <i data-lucide="hash" class="input-icon"></i>
+                            <input autocomplete="off" id="rollNumber" placeholder="Roll Number (Your ID)" class="input-field" type="text" required> 
+                        </div>
+                    `;
+                }
+            } else { // Owner
+                 if (isLogin) {
+                    roleSpecificFields = `
+                        <div class="login-field">
+                            <i data-lucide="key" class="input-icon"></i>
+                            <input autocomplete="off" id="ownerId" placeholder="Owner ID (Must be O100)" value="O100" class="input-field" type="text" required> 
+                        </div>
+                    `;
+                } else { // Register
+                    roleSpecificFields = `
+                        <div class="login-field">
+                            <i data-lucide="store" class="input-icon"></i>
+                            <input autocomplete="off" id="canteenName" placeholder="Canteen Name" class="input-field" type="text" required> 
+                            <input type="hidden" id="ownerIdRegister" value="O100">
+                        </div>
+                        <p class="text-xs text-gray-500 mt-2">Your permanent ID will be O100.</p>
+                    `;
+                }
+            }
+
+            formFields = `
+                ${roleSpecificFields}
+                <div class="login-field">
+                    <i data-lucide="lock" class="input-icon"></i>
+                    <input autocomplete="off" id="password" placeholder="Password" class="input-field" type="password" required>
+                </div>
+            `;
+
+
             return `
             <div class="login-card mx-auto">
-                <h4 class="login-title">Access QuickBites</h4>
+                <h4 class="login-title">${isLogin ? 'Log In' : 'Register'} to QuickBite</h4>
 
-                <!-- Dynamic Radio Container for Role Selection -->
-                <div class="mb-8">
+                <div class="toggle-btn-group">
+                    <button class="toggle-btn ${isLogin ? 'active' : ''}" onclick="setAuthMode('login')">LOGIN</button>
+                    <button class="toggle-btn ${!isLogin ? 'active' : ''}" onclick="setAuthMode('register')">REGISTER</button>
+                </div>
+                
+                <div class="mb-6">
                     <h5 class="text-sm text-gray-400 mb-2">Select your role:</h5>
                     <div class="radio-container mx-auto max-w-[250px]">
-                        <input checked="" id="role-student" name="userRole" type="radio" value="Student" />
+                        <input checked="" id="role-student" name="userRole" type="radio" value="Student" onchange="setView('login')" />
                         <label for="role-student">STUDENT</label>
                         
-                        <input id="role-owner" name="userRole" type="radio" value="Owner" />
+                        <input id="role-owner" name="userRole" type="radio" value="Owner" onchange="setView('login')" />
                         <label for="role-owner">OWNER</label>
                         
-                        <!-- Glider for animation -->
                         <div class="glider-container">
                             <div class="glider"></div>
                         </div>
                     </div>
                 </div>
                 
-                <form onsubmit="event.preventDefault(); login();">
-                    <div class="login-field">
-                        <!-- Custom User Icon SVG for aesthetic login field -->
-                        <svg class="input-icon" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M207.8 20.73c-93.45 18.32-168.7 93.66-187 187.1c-27.64 140.9 68.65 266.2 199.1 285.1c19.01 2.888 36.17-12.26 36.17-31.49l.0001-.6631c0-15.74-11.44-28.88-26.84-31.24c-84.35-12.98-149.2-86.13-149.2-174.2c0-102.9 88.61-185.5 193.4-175.4c91.54 8.869 158.6 91.25 158.6 183.2l0 16.16c0 22.09-17.94 40.05-40 40.05s-40.01-17.96-40.01-40.05v-120.1c0-8.847-7.161-16.02-16.01-16.02l-31.98 .0036c-7.299 0-13.2 4.992-15.12 11.68c-24.85-12.15-54.24-16.38-86.06-5.106c-38.75 13.73-68.12 48.91-73.72 89.64c-9.483 69.01 43.81 128 110.9 128c26.44 0 50.43-9.544 69.59-24.88c24 31.3 65.23 48.69 109.4 37.49C465.2 369.3 496 324.1 495.1 277.2V256.3C495.1 107.1 361.2-9.332 207.8 20.73zM239.1 304.3c-26.47 0-48-21.56-48-48.05s21.53-48.05 48-48.05s48 21.56 48 48.05S266.5 304.3 239.1 304.3z"></path>
-                        </svg>
-                        <input autocomplete="off" id="loginId" placeholder="ID (e.g., S503, F101, O100)" class="input-field" name="loginId" type="text"> 
-                    </div> 
-                    
+                <form onsubmit="event.preventDefault(); handleAuth();">
+                    ${formFields}
                     <button class="login-btn" type="submit">
-                        Login / Get Token
+                        ${submitText}
                     </button> 
                 </form>
             </div>
@@ -1112,22 +1157,10 @@
 
         function renderOrder() {
             const user = APP_STATE.users[APP_STATE.currentUserId];
-            // Safety check for user role
-            if (!user || user.role === 'Owner') {
-                setTimeout(() => setView('login'), 0); 
-                return ''; // Return empty temporarily
-            }
+            if (!user || user.role === 'Owner') return setView('login');
 
             const cookedMenu = APP_STATE.menu.filter(i => i.category !== 'packet');
             const packetMenu = APP_STATE.menu.filter(i => i.category === 'packet');
-
-            // Map item ID to a descriptive placeholder text/color for "real" images
-            const imagePlaceholders = {
-                'lays': { text: 'Potato Wafers', color: 'bg-red-400' },
-                'kurkure': { text: 'Puff Snack', color: 'bg-yellow-400' },
-                'balaji': { text: 'Sev', color: 'bg-green-400' },
-                'segar': { text: 'Salt Chips', color: 'bg-blue-400' }
-            };
 
             const cookedMenuHtml = cookedMenu.map(item => `
                 <div class="flex justify-between items-center p-3 mb-3 border-b border-gray-700 last:border-b-0 ${item.stock <= 0 ? 'opacity-50' : ''}">
@@ -1148,50 +1181,32 @@
                 </div>
             `).join('');
 
-            const packetMenuHtml = packetMenu.map((item, index) => {
-                const placeholder = imagePlaceholders[item.id] || { text: 'Snack', color: 'bg-gray-400' };
-                const bgColor = placeholder.color.replace('bg-', '');
-                return `
-                    <div class="flex flex-col items-center justify-start p-3 w-32 flex-shrink-0 ${item.stock <= 0 ? 'opacity-50' : ''}">
-                        <!-- Updated Placeholder Image to be more descriptive/real-like -->
-                        <img src="https://placehold.co/100x100/${bgColor}/1f2937?text=${placeholder.text.replace(' ', '+')}" 
-                             onerror="this.src='https://placehold.co/100x100/1f2937/FFFAF0?text=Snack'" 
-                             class="rounded-lg mb-2 border border-gray-700">
-                        <span class="text-sm font-semibold text-center leading-tight">${item.name}</span>
-                        <span class="text-xs text-gray-400 mb-2">₹${item.price}</span>
-                        <button onclick="addToCart('${item.id}')" 
-                                class="quantity-btn w-full h-8 flex items-center justify-center text-sm disabled:opacity-30" 
-                                ${item.stock <= 0 ? 'disabled' : ''}>
-                            <i data-lucide="shopping-cart" class="w-4 h-4 mr-1"></i> Add
-                        </button>
-                    </div>
-                `;
-            }).join('');
-            
-            const userRoleClass = user.role === 'Faculty' ? 'faculty' : (user.role === 'Owner' ? 'owner' : '');
+            const packetMenuHtml = packetMenu.map((item, index) => `
+                <div class="flex flex-col items-center justify-start p-3 w-32 flex-shrink-0 ${item.stock <= 0 ? 'opacity-50' : ''}">
+                    <img src="https://placehold.co/100x100/1f2937/FFFAF0?text=${item.name.split(' ')[0]}" onerror="this.src='https://placehold.co/100x100/1f2937/FFFAF0?text=Snack'" class="rounded-lg mb-2 border border-gray-700">
+                    <span class="text-sm font-semibold text-center leading-tight">${item.name}</span>
+                    <span class="text-xs text-gray-400 mb-2">₹${item.price}</span>
+                    <button onclick="addToCart('${item.id}')" 
+                            class="quantity-btn w-full h-8 flex items-center justify-center text-sm disabled:opacity-30" 
+                            ${item.stock <= 0 ? 'disabled' : ''}>
+                        <i data-lucide="shopping-cart" class="w-4 h-4 mr-1"></i> Add
+                    </button>
+                </div>
+            `).join('');
 
 
             return `
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <!-- User Info Panel -->
                 <div class="canteen-card p-6 lg:col-span-1 h-fit">
-                    <div class="flex items-center mb-4 border-b border-gray-700 pb-4">
-                        <div class="profile-pic ${userRoleClass}">${getInitials(user.name)}</div>
-                        <div class="ml-4">
-                            <h3 class="text-2xl font-bold flex items-center">
-                                ${user.name}
-                                <i data-lucide="${user.isPriority ? 'crown' : 'user'}" class="w-5 h-5 ml-2 ${user.isPriority ? 'text-yellow-500' : 'text-gray-400'}"></i>
-                            </h3>
-                            <p class="text-sm text-gray-400">${user.role} User</p>
-                        </div>
-                    </div>
+                    <h3 class="text-2xl font-bold mb-4 flex items-center">
+                        <i data-lucide="${user.isPriority ? 'crown' : 'user'}" class="w-6 h-6 mr-3 text-yellow-500"></i>
+                        ${user.name}
+                    </h3>
                     
-                    <!-- New Animated Token Component -->
                     <div class="token-button-wrapper">
                         <button type="button" class="token-button">
                             <span class="token-fold"></span>
                             <div class="token-points-wrapper">
-                                <!-- Generate floating points with staggered animation -->
                                 ${Array(10).fill(0).map((_, i) => `<i class="point" style="left: ${Math.random() * 100}%; animation-duration: ${1.5 + Math.random()}s; animation-delay: ${Math.random() * 2}s;"></i>`).join('')}
                             </div>
                             <span class="token-inner">
@@ -1201,18 +1216,14 @@
                             </span>
                         </button>
                     </div>
-                    <!-- End Animated Token Component -->
-
                     <div class="bg-red-900/30 p-3 rounded-lg border border-red-700/50 mt-4">
                         <p class="text-sm font-semibold text-red-300">Outstanding Udhar (Dues):</p>
                         <p class="text-xl font-bold text-red-400">₹${APP_STATE.udharLedger[user.token] || 0}</p>
                     </div>
                 </div>
 
-                <!-- Menu and Cart -->
                 <div class="lg:col-span-2">
                     
-                    <!-- Horizontal Scroll Snacks Section -->
                     <div class="canteen-card p-6 mb-8">
                         <h3 class="text-2xl font-bold mb-4 text-white border-b pb-2 border-gray-700 flex justify-between items-center">
                             Quick Snacks & Wafers
@@ -1223,7 +1234,6 @@
                         </div>
                     </div>
                     
-                    <!-- Cooked Menu Section -->
                     <div class="canteen-card p-6 mb-8">
                         <h3 class="text-2xl font-bold mb-4 text-white border-b pb-2 border-gray-700">Cafeteria Menu (Cooked)</h3>
                         <div id="menu-list">
@@ -1231,14 +1241,13 @@
                         </div>
                     </div>
 
-                    <!-- Cart Section -->
                     <div class="canteen-card p-6">
                         <h3 class="text-2xl font-bold mb-4 flex items-center">
                             <i data-lucide="shopping-cart" class="w-6 h-6 mr-3 text-white"></i>
                             Your Order Cart
                         </h3>
                         <div id="cart-items" class="min-h-[50px] text-center text-gray-500 p-4 border border-dashed border-gray-700 rounded-lg">
-                            <!-- Cart items rendered here by updateCartUI() -->
+                            Cart is empty. Add items above.
                         </div>
                         <div class="flex justify-between items-center mt-4 pt-4 border-t border-gray-700">
                             <span class="text-xl font-bold">Total: <span id="cart-total" style="color:var(--primary-color);">₹0</span></span>
@@ -1254,26 +1263,18 @@
 
         function renderQueue() {
             const user = APP_STATE.users[APP_STATE.currentUserId];
-            // Safety check for user role
-            if (!user || user.role === 'Owner') {
-                setTimeout(() => setView('login'), 0); 
-                return '';
-            }
+            if (!user || user.role === 'Owner') return setView('login');
 
             const myOrder = APP_STATE.orderQueue.find(o => o.token === user.token);
             
-            // Sort: Ready > In Prep > Queued. Faculty (F-prefix) priority first within status groups.
-            const allOrders = APP_STATE.orderQueue.slice().sort((a, b) => {
-                const aIsPrio = a.token.startsWith('F');
-                const bIsPrio = b.token.startsWith('F');
-
-                // Priority Check
-                if (aIsPrio && !bIsPrio) return -1;
-                if (!aIsPrio && bIsPrio) return 1;
-
-                // Status Check
+            const allOrders = APP_STATE.orderQueue.sort((a, b) => {
+                // Primary sort: Ready/In Prep/Queued
                 const statusOrder = { 'Ready': 1, 'In Prep': 2, 'Queued': 3 };
-                return statusOrder[a.status] - statusOrder[b.status];
+                const statusDiff = statusOrder[a.status] - statusOrder[b.status];
+                if (statusDiff !== 0) return statusDiff;
+
+                // Secondary sort: By pickup time (earlier first)
+                return a.scheduledPickupTimeMs - b.scheduledPickupTimeMs;
             });
 
             const queueHtml = allOrders.map(order => {
@@ -1310,7 +1311,6 @@
                     
                     <button onclick="cancelFullOrder('${myOrder.id}')" 
                             class="glow-button w-full mt-4 py-2 text-sm bg-red-600 hover:bg-red-500 disabled:opacity-50"
-                            style="--primary-color: #f87171;" 
                             ${myOrder.status === 'Ready' ? 'disabled' : ''}>
                         Cancel Entire Order
                     </button>
@@ -1346,7 +1346,6 @@
         }
 
         function renderLeaderboard() {
-            // Filter out 'Owner' and sort by orders placed (descending)
             const sortedUsers = Object.values(APP_STATE.users)
                 .filter(u => u.role !== 'Owner')
                 .sort((a, b) => b.ordersPlaced - a.ordersPlaced);
@@ -1375,7 +1374,7 @@
             <div class="max-w-lg mx-auto">
                 
                 <button class="leaderboard-btn-glow" onclick="setView('leaderboard')">
-                    <span>🏆 QUICKBITES LEADERBOARD 🏆</span>
+                    <span>🏆 QUICKBITE FOODIE LEADERBOARD 🏆</span>
                 </button>
                 
                 <div class="canteen-card p-6">
@@ -1387,27 +1386,17 @@
         
         function renderAccount() {
             const user = APP_STATE.users[APP_STATE.currentUserId];
-            // Safety check for user
-            if (!user) {
-                setTimeout(() => setView('login'), 0); 
-                return '';
-            }
-
-            const userRoleClass = user.role === 'Faculty' ? 'faculty' : (user.role === 'Owner' ? 'owner' : '');
+            if (!user) return setView('login');
 
             return `
             <div class="max-w-md mx-auto">
                 <h2 class="text-3xl font-bold text-center mb-6">Account & Settings</h2>
                 
                 <div class="canteen-card p-6 mb-6 space-y-3">
-                    <div class="flex items-center border-b border-gray-700 pb-4 mb-4">
-                        ${getProfileHtml(user)}
-                        <div class="ml-4">
-                            <span class="text-gray-400 flex items-center mb-1"><i data-lucide="user-check" class="w-5 h-5 mr-2"></i> User:</span>
-                            <span class="font-semibold text-lg">${user.name} (${user.id})</span>
-                        </div>
+                    <div class="flex justify-between items-center border-b border-gray-700 pb-2">
+                        <span class="text-gray-400 flex items-center"><i data-lucide="user-check" class="w-5 h-5 mr-2"></i> User:</span>
+                        <span class="font-semibold">${user.name} (${user.id})</span>
                     </div>
-
                     <div class="flex justify-between items-center border-b border-gray-700 pb-2">
                         <span class="text-gray-400 flex items-center"><i data-lucide="fingerprint" class="w-5 h-5 mr-2"></i> Token:</span>
                         <span class="font-semibold" style="color:var(--primary-color);">${user.token}</span>
@@ -1424,14 +1413,13 @@
                         <span class="text-red-300 font-semibold">Pending Dues:</span>
                         <span class="text-2xl font-bold text-red-400">₹${APP_STATE.udharLedger[user.token] || 0}</span>
                     </div>
-                    <button class="login-btn w-full py-2 text-sm bg-green-600 hover:bg-green-500" style="--primary-color: #10B981;" onclick="clearUdhar()" ${APP_STATE.udharLedger[user.token] <= 0 ? 'disabled' : ''}>
+                    <button onclick="clearUdhar()" class="login-btn w-full py-2 text-sm bg-green-600 hover:bg-green-500">
                         Clear Dues Now (Simulated Payment)
                     </button>
                 </div>
                 
-                <!-- MOVED LOGOUT INTO A CARD-STYLE BUTTON FOR BETTER VISUAL HIERARCHY -->
-                <button onclick="logout()" class="login-btn w-full py-2 text-sm bg-red-600 hover:bg-red-500" style="--primary-color: #F87171;">
-                    <i data-lucide="log-out" class="w-5 h-5 mr-2 inline-block"></i> Logout
+                <button onclick="logout()" class="w-full py-2 text-sm text-red-400 hover:text-red-300 transition-colors mt-4">
+                    Logout
                 </button>
             </div>
             `;
@@ -1439,11 +1427,7 @@
 
         function renderOwnerDashboard() {
             const user = APP_STATE.users[APP_STATE.currentUserId];
-            // Safety check for user role
-            if (!user || user.role !== 'Owner') {
-                setTimeout(() => setView('login'), 0); 
-                return '';
-            }
+            if (!user || user.role !== 'Owner') return setView('login');
             
             // --- Live Orders Processing ---
             const liveOrders = APP_STATE.orderQueue.filter(o => o.status !== 'Complete');
@@ -1485,17 +1469,6 @@
                 </div>
             `).join('') : '<p class="text-gray-400 text-center py-4">No outstanding dues recorded.</p>';
             
-            // --- Notification Log Processing ---
-            const notificationHtml = APP_STATE.ownerNotifications.slice().reverse().slice(0, 5).map(n => `
-                <div class="bg-green-900/30 p-3 rounded-lg mb-2 flex items-center">
-                    <i data-lucide="badge-check" class="w-5 h-5 mr-3 text-green-400 flex-shrink-0"></i>
-                    <p class="text-sm text-green-300">
-                        <span class="font-bold">${n.name} (#${n.token})</span> cleared dues of <span class="font-bold">₹${n.amount}</span>.
-                    </p>
-                    <span class="text-xs text-gray-500 ml-auto">${n.timestamp}</span>
-                </div>
-            `).join('');
-
             // --- Stock Management Processing ---
             const stockHtml = APP_STATE.menu.map(item => `
                 <div class="flex justify-between items-center py-2 border-b border-gray-700">
@@ -1509,7 +1482,7 @@
             `).join('');
 
             // --- Cancellation Board Processing ---
-            const cancelledHtml = APP_STATE.cancelledOrders.slice().reverse().slice(0, 10).map(c => `
+            const cancelledHtml = APP_STATE.cancelledOrders.slice().reverse().map(c => `
                 <div class="bg-gray-800/50 p-3 rounded-lg mb-2">
                     <p class="font-semibold text-sm text-red-300">${c.reason} (Token: ${c.token})</p>
                     <p class="text-xs text-gray-400">Time: ${c.timestamp}</p>
@@ -1521,10 +1494,9 @@
             `).join('');
 
             return `
-                <h2 class="text-3xl font-bold text-center mb-6 text-white">${user.name}'s Dashboard</h2>
+                <h2 class="text-3xl font-bold text-center mb-6 text-white">${user.canteen}'s Dashboard</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 
-                    <!-- Live Orders -->
                     <div class="canteen-card p-6 lg:col-span-2">
                         <h3 class="text-2xl font-bold mb-4 border-b pb-2 border-gray-700">Live Orders (${liveOrders.length})</h3>
                         <div class="h-96 overflow-y-auto pr-2">
@@ -1532,7 +1504,6 @@
                         </div>
                     </div>
 
-                    <!-- Stock Management -->
                     <div class="canteen-card p-6">
                         <h3 class="text-2xl font-bold mb-4 border-b pb-2 border-gray-700">Stock & Inventory</h3>
                         <div class="h-96 overflow-y-auto pr-2">
@@ -1540,7 +1511,6 @@
                         </div>
                     </div>
 
-                    <!-- Digital Dues Ledger -->
                     <div class="canteen-card p-6 lg:col-span-1">
                         <h3 class="text-2xl font-bold mb-4 border-b pb-2 border-gray-700">Digital Dues Ledger (Udhar)</h3>
                         <div class="h-96 overflow-y-auto pr-2">
@@ -1548,24 +1518,15 @@
                         </div>
                     </div>
                     
-                    <!-- Notification Log -->
-                    <div class="canteen-card p-6 lg:col-span-1">
-                        <h3 class="text-2xl font-bold mb-4 border-b pb-2 border-gray-700">Payment Notifications</h3>
-                        <div class="h-auto max-h-56 overflow-y-auto pr-2">
-                            ${notificationHtml || '<p class="text-gray-400 text-center py-4">No recent payment notifications.</p>'}
-                        </div>
-                    </div>
-
-                    <!-- Cancellation Board -->
                     <div class="canteen-card p-6 lg:col-span-2">
-                        <h3 class="text-2xl font-bold mb-4 border-b pb-2 border-gray-700">Cancelled Orders & Items (Recent)</h3>
+                        <h3 class="text-2xl font-bold mb-4 border-b pb-2 border-gray-700">Cancelled Orders & Items</h3>
                         <div class="h-96 overflow-y-auto pr-2">
                             ${cancelledHtml || '<p class="text-gray-400 text-center py-4">No cancellations recorded.</p>'}
                         </div>
                     </div>
 
                 </div>
-                <button onclick="logout()" class="glow-button w-full mt-6 py-3 rounded-lg bg-gray-700 hover:bg-gray-600 text-sm" style="--primary-color: #9CA3AF;">Logout</button>
+                <button onclick="logout()" class="glow-button w-full mt-6 py-3 rounded-lg bg-red-600 hover:bg-red-500 text-sm">Logout</button>
             `;
         }
 

@@ -609,9 +609,10 @@
 
             orderQueue: [
                 // Initial orders (must have scheduledPickupTimeMs)
-                { id: 'Q1', token: 'S-503', items: [{ name: 'Masala Tea', quantity: 1, price: 15, prepTime: 2 }], status: 'In Prep', eta: '10:45 AM', total: 15, scheduledPickupTimeMs: Date.now() + 5 * 60 * 1000 },
-                { id: 'Q2', token: 'F-101', items: [{ name: 'Samosa', quantity: 2, price: 20, prepTime: 0.5 }], status: 'Ready', eta: '10:40 AM', total: 40, scheduledPickupTimeMs: Date.now() + 10 * 60 * 1000 },
-                { id: 'Q3', token: 'S-210', items: [{ name: 'Maggi', quantity: 1, price: 50, prepTime: 10 }], status: 'Queued', eta: '10:50 AM', total: 50, scheduledPickupTimeMs: Date.now() + 20 * 60 * 1000 },
+                // Set initial times relative to now for realistic ETA behavior
+                { id: 'Q1', token: 'S-503', items: [{ name: 'Masala Tea', quantity: 1, price: 15, prepTime: 2 }], status: 'In Prep', eta: new Date(Date.now() + 5 * 60 * 1000).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }), total: 15, scheduledPickupTimeMs: Date.now() + 5 * 60 * 1000 },
+                { id: 'Q2', token: 'F-101', items: [{ name: 'Samosa', quantity: 2, price: 20, prepTime: 0.5 }], status: 'Ready', eta: new Date(Date.now() + 10 * 60 * 1000).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }), total: 40, scheduledPickupTimeMs: Date.now() + 10 * 60 * 1000 },
+                { id: 'Q3', token: 'S-210', items: [{ name: 'Maggi', quantity: 1, price: 50, prepTime: 10 }], status: 'Queued', eta: new Date(Date.now() + 20 * 60 * 1000).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }), total: 50, scheduledPickupTimeMs: Date.now() + 20 * 60 * 1000 },
             ],
 
             cancelledOrders: [
@@ -632,6 +633,54 @@
 
         let cart = [];
         let currentAuthMode = 'login'; // 'login' or 'register'
+
+        // --- PROFILE PICTURE UTILITIES (Defined early to resolve ReferenceError) ---
+
+        // Utility to get initials for profile pic
+        function getInitials(name) {
+            if (!name) return '??';
+            return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+        }
+
+        function setProfilePicture() {
+            // Trigger the hidden file input click (Input is rendered in renderAccount)
+            document.getElementById('profile-upload').click();
+        }
+
+        function handleProfileImage(event) {
+            const file = event.target.files[0];
+            const userId = APP_STATE.currentUserId;
+            if (file && userId) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    // Store the image data URL
+                    APP_STATE.userProfiles[userId] = e.target.result;
+                    showMessage("Profile picture updated!", 'success');
+                    // Re-render the account view to show the new picture
+                    setView('account');
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+        
+        function getProfileHtml(user) {
+            const profileUrl = APP_STATE.userProfiles[user.id];
+            const initials = getInitials(user.name);
+            const userRoleClass = user.role === 'Faculty' ? 'faculty' : (user.role === 'Owner' ? 'owner' : '');
+            
+            // This entire component is clickable to trigger the file input
+            const profileComponent = profileUrl 
+                ? `<img src="${profileUrl}" alt="${user.name}" class="profile-pic ${userRoleClass} cursor-pointer">`
+                : `<div class="profile-pic ${userRoleClass} cursor-pointer">${initials}</div>`;
+
+            // We wrap it in a container that handles the click and holds the hidden input
+            return `
+                <div onclick="setProfilePicture()">
+                    ${profileComponent}
+                    <input type="file" id="profile-upload" accept="image/*" class="hidden" onchange="handleProfileImage(event)">
+                </div>
+            `;
+        }
 
         // --- UTILITY & VIEW SWITCHING ---
 
@@ -798,10 +847,22 @@
             let id;
 
             if (role === 'Student') {
+                // For Student Login, we use RollNumber (ID) and Name to find the user
                 id = document.getElementById('rollNumberLogin').value.trim();
-                if (!id || !password) {
-                    return showMessage('Please enter your Roll Number and Password.', 'error');
+                const studentName = document.getElementById('studentNameLogin').value.trim();
+                
+                // Find user by ID first
+                const user = APP_STATE.users[id];
+
+                // Additional check: Name validation for student login
+                if (!user || user.password !== password || user.role !== role || user.name !== studentName) {
+                    return showMessage('Login failed: Invalid Name, Roll Number, or Password.', 'error');
                 }
+
+                if (!id || !studentName || !password) {
+                    return showMessage('Please enter your Name, Roll Number, and Password.', 'error');
+                }
+
             } else { // Owner
                 id = document.getElementById('ownerId').value.trim();
                 if (id !== 'O100') {
@@ -1129,12 +1190,6 @@
             clearDues(user.token);
         }
         
-        // Utility to get initials for profile pic
-        function getInitials(name) {
-            if (!name) return '??';
-            return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
-        }
-
         // --- UI RENDERING FUNCTIONS ---
         
         function renderLogin() {
@@ -1305,7 +1360,7 @@
                 <!-- User Info Panel -->
                 <div class="canteen-card p-6 lg:col-span-1 h-fit">
                     <div class="flex items-center mb-4 border-b border-gray-700 pb-4">
-                        <div class="profile-pic ${userRoleClass}">${getInitials(user.name)}</div>
+                        ${getProfileHtml(user)}
                         <div class="ml-4">
                             <h3 class="text-2xl font-bold flex items-center">
                                 ${user.name}

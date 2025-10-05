@@ -1,1 +1,1087 @@
-2nd web
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuickBite - Dynamic Canteen Order System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Times+New+Roman:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        :root {
+            --primary-color: #f7e479; /* Soft Gold/Yellow for highlights */
+            --dark-bg: #111827; /* Dark Slate Blue/Black background */
+            --card-bg: #1f2937; /* Slightly lighter card background */
+            --login-card-bg: #2a2b38; /* Your login card background */
+            --login-input-bg: #1f2029; /* Your login input background */
+            --text-color: #f3f4f6;
+            --accent-glow: 0 0 5px var(--primary-color), 0 0 10px var(--primary-color);
+        }
+
+        body {
+            font-family: 'Times New Roman', serif;
+            background-color: var(--dark-bg);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        /* Base Card Styling (Used in all non-login views) */
+        .canteen-card {
+            background-color: var(--card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .canteen-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
+        }
+
+        /* Standard Glow Button Styling */
+        .glow-button {
+            background: var(--primary-color);
+            color: var(--dark-bg);
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .glow-button:hover {
+            background: #fff;
+            box-shadow: var(--accent-glow);
+        }
+
+        .glow-button:active {
+            transform: scale(0.98);
+        }
+
+        /* --- USER PROVIDED LOGIN CARD STYLES --- */
+        .login-card {
+            width: 100%;
+            max-width: 320px;
+            padding: 1.9rem 1.2rem;
+            text-align: center;
+            background: var(--login-card-bg);
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+        }
+
+        .login-title {
+            margin-bottom: 1rem;
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #f5f5f5;
+        }
+
+        .login-field {
+            margin-top: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: .5em;
+            background-color: var(--login-input-bg);
+            border-radius: 6px;
+            padding: .75em 1em;
+            border: 1px solid transparent;
+            transition: border-color 0.3s;
+        }
+        .login-field:focus-within {
+            border-color: var(--primary-color);
+        }
+
+        .input-icon {
+            height: 1em;
+            width: 1em;
+            fill: var(--primary-color);
+        }
+
+        .input-field {
+            background: none;
+            border: none;
+            outline: none;
+            width: 100%;
+            color: var(--text-color);
+            padding: 0;
+        }
+       
+        .login-btn {
+            margin-top: 1.5rem;
+            border: none;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: .9em;
+            text-transform: uppercase;
+            padding: 0.8em 1.2em;
+            background-color: var(--primary-color);
+            color: var(--login-card-bg);
+            box-shadow: 0 8px 24px 0 rgb(255 235 167 / 20%);
+            transition: all .3s ease-in-out;
+            width: 100%;
+        }
+
+        .login-btn:hover {
+            background-color: #fff;
+            color: #5e6681;
+            box-shadow: 0 8px 24px 0 rgba(247, 228, 121, 0.4);
+        }
+       
+        /* --- DYNAMIC RADIO BUTTON STYLES --- */
+        .radio-container {
+            --main-color: var(--primary-color);
+            --main-color-opacity: #f7e4791c;
+            --total-radio: 2; 
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            padding-left: 0.5rem;
+            background-color: var(--login-input-bg);
+            border-radius: 6px;
+        }
+        .radio-container input {
+            cursor: pointer;
+            appearance: none;
+        }
+        .radio-container .glider-container {
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            background: linear-gradient(0deg, rgba(0, 0, 0, 0) 0%, rgba(27, 27, 27, 1) 50%, rgba(0, 0, 0, 0) 100%);
+            width: 1px;
+            border-radius: 6px;
+        }
+        .radio-container .glider-container .glider {
+            position: relative;
+            height: calc(100% / var(--total-radio));
+            width: 100%;
+            background: linear-gradient(0deg, rgba(0, 0, 0, 0) 0%, var(--main-color) 50%, rgba(0, 0, 0, 0) 100%);
+            transition: transform 0.5s cubic-bezier(0.37, 1.95, 0.66, 0.56);
+        }
+        .radio-container .glider-container .glider::before {
+            content: "";
+            position: absolute;
+            height: 60%;
+            width: 300%;
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--main-color);
+            filter: blur(10px);
+        }
+        .radio-container .glider-container .glider::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            height: 100%;
+            width: 150px;
+            background: linear-gradient(90deg, var(--main-color-opacity) 0%, rgba(0, 0, 0, 0) 100%);
+        }
+        .radio-container label {
+            cursor: pointer;
+            padding: 0.75rem 1rem;
+            position: relative;
+            color: #9ca3af;
+            transition: all 0.3s ease-in-out;
+            text-align: left;
+        }
+        .radio-container input:checked + label {
+            color: var(--main-color);
+            font-weight: bold;
+        }
+        .radio-container input:nth-of-type(1):checked ~ .glider-container .glider {
+            transform: translateY(0);
+        }
+        .radio-container input:nth-of-type(2):checked ~ .glider-container .glider {
+            transform: translateY(100%);
+        }
+        /* --- END DYNAMIC RADIO BUTTON STYLES --- */
+
+
+        /* --- LEADERBOARD GLOW BUTTON STYLES (Adaptation) --- */
+        .leaderboard-btn-glow {
+            position: relative;
+            text-decoration: none;
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            line-height: 55px;
+            width: 100%;
+            cursor: pointer;
+            font-weight: bold;
+            height: 60px;
+            margin-bottom: 2rem;
+            display: block;
+            -webkit-box-reflect: bottom 1px linear-gradient(transparent, #0004);
+        }
+
+        .leaderboard-btn-glow span {
+            position: absolute;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            top: 4px;
+            right: 4px;
+            bottom: 4px;
+            left: 4px;
+            text-align: center;
+            background: var(--card-bg); /* Use theme card BG */
+            color: rgba(255, 255, 255, 0.9);
+            transition: 0.5s;
+            z-index: 1;
+            padding: 0 10px;
+        }
+
+        .leaderboard-btn-glow:hover span {
+            color: var(--primary-color);
+        }
+
+        .leaderboard-btn-glow::before,
+        .leaderboard-btn-glow::after {
+            content: "";
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            background-size: 400%;
+            opacity: 0;
+            transition: 0.5s;
+            background: linear-gradient(
+                45deg,
+                #fb0094, /* Magenta */
+                #525296, /* Indigo */
+                #ff8800, /* Orange */
+                #00f,    /* Blue */
+                #fb0094
+            );
+            animation: animate123 10s linear infinite;
+        }
+        .leaderboard-btn-glow::after {
+            filter: blur(20px);
+        }
+
+        .leaderboard-btn-glow:hover::before,
+        .leaderboard-btn-glow:hover::after {
+            opacity: 1;
+        }
+
+        @keyframes animate123 {
+            0% { background-position: 0 0; }
+            50% { background-position: 300% 0; }
+            100% { background-position: 0 0; }
+        }
+        /* --- END LEADERBOARD GLOW BUTTON STYLES --- */
+
+        /* --- TOKEN PARTICULER STYLES (Adapted for display only) --- */
+        .token-particulier {
+            --ease-elastic: cubic-bezier(0.5, 2, 0.3, 0.8);
+            --ease-elastic-2: cubic-bezier(0.5, -1, 0.3, 0.8);
+            --primary-token: var(--primary-color);
+            --rounded-max: 100px;
+            --rounded-min: 10px;
+            --h: 78px;
+            display: block;
+            width: 100%;
+            overflow: hidden;
+            position: relative;
+            z-index: 10; /* Bring it above other elements */
+            margin-bottom: 20px;
+        }
+        .token-wrapper {
+            display: flex;
+            border-radius: 100px;
+            position: relative;
+            z-index: 2;
+            pointer-events: none; /* Disable interaction for simplicity */
+        }
+        .token-part-1 {
+            position: relative;
+            z-index: 1;
+            height: var(--h);
+            width: 80px;
+            border-radius: var(--rounded-max) var(--rounded-min) var(--rounded-min) var(--rounded-max);
+        }
+        .token-part-1 .case {
+            height: var(--h);
+            width: 80px;
+            border-radius: inherit;
+            background: linear-gradient(to bottom, #2c2e31 0%, #31343e 20%, #212329 100%);
+            box-shadow: inset 8px -15px 15px -10px black, inset 10px -17px 12px -12px white, 0 30px 70px -5px #111;
+        }
+        .token-part-2 {
+            position: relative;
+            height: var(--h);
+            flex-grow: 1;
+            min-width: 160px;
+            border-radius: var(--rounded-min) var(--rounded-max) var(--rounded-max) var(--rounded-min);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.6s ease;
+        }
+        .token-part-2 .glass {
+            position: relative;
+            overflow: hidden;
+            height: 100%;
+            width: 100%;
+            border-radius: inherit;
+            border-left: 1px solid rgba(0, 0, 0, 0.3);
+            background: linear-gradient(
+                to bottom, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.2) 50%, rgba(0, 0, 0, 0.5) 100%
+            );
+            box-shadow: inset 0 0 7px -4px white, inset 0 -10px 10px -8px rgba(255, 255, 255, 0.4), inset 8px -15px 15px -10px black, inset 8px -10px 12px -12px white, 0 30px 70px -5px #111;
+        }
+        .token-part-2 .token-content {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+            padding-right: 20px;
+        }
+        .token-part-2 .glass-reflex {
+            position: absolute;
+            inset: 0;
+            width: 70%;
+            border-radius: 0 50% 50% 0;
+            background: linear-gradient(
+                to right, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.2) 100%
+            );
+            transform: translateX(-115%) skewX(30deg) scale(1.5);
+            animation: reflex 3s infinite ease-in-out;
+        }
+        @keyframes reflex {
+            0% { transform: translateX(-115%) skewX(30deg); }
+            50% { transform: translateX(100%) skewX(30deg); }
+            100% { transform: translateX(-115%) skewX(30deg); }
+        }
+        /* --- END TOKEN PARTICULER STYLES --- */
+
+        /* --- Other original styles (Leaderboard item, icons, etc.) --- */
+        .settings-menu {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+       
+        .settings-value {
+            background-color: transparent;
+            border: none;
+            padding: 15px 20px;
+            color: white;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            border-radius: 4px;
+            text-align: left;
+            transition: background-color 0.3s, color 0.3s;
+        }
+       
+        .settings-value:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .settings-value:focus, .settings-value:active {
+            background-color: rgba(247, 228, 121, 0.1);
+            outline: none;
+        }
+
+        .settings-value svg {
+            width: 20px;
+            height: 20px;
+            stroke: #9ca3af; /* Default icon color */
+        }
+       
+        .settings-value:hover svg {
+            stroke: var(--primary-color);
+        }
+
+        .token-display {
+            background: linear-gradient(135deg, #252b35, #1f2937);
+            border-left: 5px solid var(--primary-color);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+        }
+
+        .leader-item {
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 8px;
+            transition: all 0.3s ease;
+        }
+        .leader-item:nth-child(1) { background-color: #d9770644; border-left: 4px solid #fcd34d; }
+        .leader-item:nth-child(2) { background-color: #9ca3af44; border-left: 4px solid #d1d5db; }
+        .leader-item:nth-child(3) { background-color: #b4530944; border-left: 4px solid #fb923c; }
+        .leader-item:hover { background-color: #4b5563; }
+
+        .icon-container {
+            transition: all 0.3s ease;
+        }
+        .icon-container:hover {
+            color: var(--primary-color);
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+<body onload="setView('login')">
+
+    <div id="app" class="w-full max-w-5xl">
+        <header class="text-center mb-8">
+            <h1 class="text-5xl font-bold tracking-widest text-white mb-2" style="text-shadow: 0 0 10px var(--primary-color);">
+                QUICKBITE
+            </h1>
+            <p class="text-gray-400 text-lg">Smart Canteen Order System</p>
+        </header>
+
+        <div id="view-container" class="transition-all duration-500 pb-20 md:pb-10">
+            </div>
+
+        <nav class="fixed bottom-0 left-0 right-0 p-4 bg-gray-900 border-t border-gray-700 shadow-2xl z-50">
+            <div class="flex justify-around max-w-xl mx-auto">
+                <button onclick="setView('order')" class="icon-container flex flex-col items-center text-sm p-2 rounded-lg text-gray-400 hover:text-white transition-colors">
+                    <i data-lucide="utensils" class="w-6 h-6 mb-1"></i>
+                    Order Now
+                </button>
+                <button onclick="setView('queue')" class="icon-container flex flex-col items-center text-sm p-2 rounded-lg text-gray-400 hover:text-white transition-colors">
+                    <i data-lucide="clock-4" class="w-6 h-6 mb-1"></i>
+                    My Queue
+                </button>
+                <button onclick="setView('leaderboard')" class="icon-container flex flex-col items-center text-sm p-2 rounded-lg text-gray-400 hover:text-white transition-colors">
+                    <i data-lucide="trophy" class="w-6 h-6 mb-1"></i>
+                    Leaderboard
+                </button>
+                <button onclick="setView('account')" class="icon-container flex flex-col items-center text-sm p-2 rounded-lg text-gray-400 hover:text-white transition-colors">
+                    <i data-lucide="settings" class="w-6 h-6 mb-1"></i>
+                    Account
+                </button>
+                <button onclick="setView('owner')" class="icon-container flex flex-col items-center text-sm p-2 rounded-lg text-gray-400 hover:text-white transition-colors">
+                    <i data-lucide="shield-half" class="w-6 h-6 mb-1"></i>
+                    Owner
+                </button>
+            </div>
+        </nav>
+    </div>
+
+    <script>
+        // --- DATA / STATE MANAGEMENT (Simulated) ---
+
+        const APP_STATE = {
+            users: {
+                // Initial users for demonstration
+                'F101': { id: 'F101', name: 'Dr. Jane Smith', role: 'Faculty', token: 'F-101', ordersPlaced: 55, isPriority: true, isLoggedIn: true },
+                'S503': { id: 'S503', name: 'Aarav Sharma', role: 'Student', token: 'S-503', ordersPlaced: 92, isPriority: false, isLoggedIn: true },
+                'S888': { id: 'S888', name: 'Priya Verma', role: 'Student', token: 'S-888', ordersPlaced: 15, isPriority: false, isLoggedIn: true },
+                'O001': { id: 'O001', name: 'Canteen Manager', role: 'Owner', token: 'O-001', ordersPlaced: 0, isPriority: true, isLoggedIn: true }, // Owner Login
+            },
+            currentUserId: null, // Starts as null to force login view
+
+            menu: [
+                { id: 'samosa', name: 'Samosa', price: 20, stock: 25 },
+                { id: 'tea', name: 'Masala Tea', price: 15, stock: 99 },
+                { id: 'coffee', name: 'Cold Coffee', price: 60, stock: 12 },
+                { id: 'thali', name: 'Veg Thali', price: 100, stock: 4 },
+                { id: 'sandwich', name: 'Grilled Sandwich', price: 75, stock: 0 },
+            ],
+
+            orderQueue: [
+                { token: 'S-503', items: 'Tea, Thali', status: 'In Prep', eta: '10:45 AM', id: Date.now() + 1 },
+                { token: 'F-101', items: 'Samosa, Coffee', status: 'Ready', eta: '10:40 AM', id: Date.now() + 2 },
+                { token: 'S-210', items: 'Sandwich', status: 'Queued', eta: '10:50 AM', id: Date.now() + 3 },
+            ],
+
+            udharLedger: {
+                'F-101': 450,
+                'S-503': 120,
+                'S-888': 0,
+                'S-210': 30,
+            },
+
+            activityFeed: [
+                { time: new Date().toLocaleTimeString('en-US'), type: 'info', message: 'System Initialized.' },
+            ]
+        };
+
+        // --- AUTHENTICATION / REGISTRATION ---
+
+        function login() {
+            const id = document.getElementById('loginId').value.trim();
+            const role = document.querySelector('input[name="userRole"]:checked')?.value;
+            
+            if (!id || !role) {
+                showMessage('Please enter your ID and select a role.', 'error');
+                return;
+            }
+
+            // Special check for owner login
+            if (role === 'Owner') {
+                if (id === 'O001') {
+                    APP_STATE.currentUserId = 'O001';
+                    showMessage(`Welcome, Canteen Manager!`, 'success');
+                    setView('owner');
+                    return;
+                } else {
+                    showMessage('Invalid ID for Owner role.', 'error');
+                    return;
+                }
+            }
+
+            const userExists = APP_STATE.users[id];
+
+            if (!userExists) {
+                const token = (role === 'Faculty' ? 'F' : 'S') + Math.floor(Math.random() * 900 + 100);
+                const newUser = {
+                    id: id,
+                    name: id,
+                    role: role,
+                    token: token,
+                    ordersPlaced: 0,
+                    isPriority: role === 'Faculty',
+                    isLoggedIn: true
+                };
+                APP_STATE.users[id] = newUser;
+                APP_STATE.udharLedger[token] = 0;
+                APP_STATE.currentUserId = id;
+                showMessage(`Welcome! Your new token is **${token}**.`, 'success');
+            } else {
+                APP_STATE.currentUserId = id;
+                showMessage(`Welcome back, ${userExists.name}!`, 'success');
+            }
+            
+            setView('order');
+        }
+
+        // --- UI RENDERING FUNCTIONS ---
+
+        function renderLogin() {
+            const isLoggedIn = APP_STATE.currentUserId && APP_STATE.users[APP_STATE.currentUserId]?.isLoggedIn;
+            if (isLoggedIn) {
+                const role = APP_STATE.users[APP_STATE.currentUserId].role;
+                setView(role === 'Owner' ? 'owner' : 'order');
+                return;
+            }
+
+            return `
+            <div class="login-card mx-auto">
+                <h4 class="login-title">Access QuickBite</h4>
+
+                <div class="mb-8">
+                    <h5 class="text-sm text-gray-400 mb-2">Select your role:</h5>
+                    <div class="radio-container mx-auto max-w-[250px]" style="--total-radio: 3;">
+                        <input checked="" id="role-student" name="userRole" type="radio" value="Student" />
+                        <label for="role-student">STUDENT</label>
+                        
+                        <input id="role-faculty" name="userRole" type="radio" value="Faculty" />
+                        <label for="role-faculty">FACULTY/STAFF</label>
+                        
+                        <input id="role-owner" name="userRole" type="radio" value="Owner" />
+                        <label for="role-owner">CANTEEN OWNER</label>
+
+                        <div class="glider-container">
+                            <div class="glider"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <form onsubmit="event.preventDefault(); login();">
+                    <div class="login-field">
+                        <svg class="input-icon" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M207.8 20.73c-93.45 18.32-168.7 93.66-187 187.1c-27.64 140.9 68.65 266.2 199.1 285.1c19.01 2.888 36.17-12.26 36.17-31.49l.0001-.6631c0-15.74-11.44-28.88-26.84-31.24c-84.35-12.98-149.2-86.13-149.2-174.2c0-102.9 88.61-185.5 193.4-175.4c91.54 8.869 158.6 91.25 158.6 183.2l0 16.16c0 22.09-17.94 40.05-40 40.05s-40.01-17.96-40.01-40.05v-120.1c0-8.847-7.161-16.02-16.01-16.02l-31.98 .0036c-7.299 0-13.2 4.992-15.12 11.68c-24.85-12.15-54.24-16.38-86.06-5.106c-38.75 13.73-68.12 48.91-73.72 89.64c-9.483 69.01 43.81 128 110.9 128c26.44 0 50.43-9.544 69.59-24.88c24 31.3 65.23 48.69 109.4 37.49C465.2 369.3 496 324.1 495.1 277.2V256.3C495.1 107.1 361.2-9.332 207.8 20.73zM239.1 304.3c-26.47 0-48-21.56-48-48.05s21.53-48.05 48-48.05s48 21.56 48 48.05S266.5 304.3 239.1 304.3z"></path>
+                        </svg>
+                        <input autocomplete="off" id="loginId" placeholder="College/Employee ID (e.g., S503 or O001)" class="input-field" name="loginId" type="text"> 
+                    </div> 
+                    
+                    <button class="login-btn" type="submit">
+                        Login / Get Token
+                    </button> 
+                </form>
+            </div>
+            `;
+        }
+
+        function renderOrder() {
+            const user = APP_STATE.users[APP_STATE.currentUserId];
+            if (!user || user.role === 'Owner') return renderLogin(); // Block Owner from this view
+
+            const menuHtml = APP_STATE.menu.map(item => `
+                <div class="flex justify-between items-center p-3 mb-3 border-b border-gray-700 last:border-b-0 ${item.stock <= 0 ? 'opacity-50' : ''}">
+                    <div class="flex flex-col">
+                        <span class="text-lg font-semibold">${item.name}</span>
+                        <span class="text-sm text-gray-400">₹${item.price}</span>
+                    </div>
+                    <div class="flex items-center">
+                        <span class="text-sm mr-4 ${item.stock > 10 ? 'text-green-400' : (item.stock > 0 ? 'text-yellow-400' : 'text-red-500')}">
+                            ${item.stock > 0 ? `${item.stock} left` : 'Out of Stock ❌'}
+                        </span>
+                        <button onclick="addToCart('${item.id}')" 
+                                class="w-10 h-10 rounded-full bg-blue-600 text-white hover:bg-blue-700 transition-colors disabled:opacity-30" 
+                                ${item.stock <= 0 ? 'disabled' : ''}>
+                            <i data-lucide="plus" class="w-5 h-5 mx-auto"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+
+            return `
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div class="canteen-card p-6 lg:col-span-1 h-fit">
+                    <h3 class="text-2xl font-bold mb-4 flex items-center">
+                        <i data-lucide="${user.isPriority ? 'crown' : 'user'}" class="w-6 h-6 mr-3 text-yellow-500"></i>
+                        ${user.name}
+                    </h3>
+                    
+                    <div class="token-particulier">
+                        <div class="token-wrapper">
+                            <div class="token-part-1">
+                                <div class="case"></div>
+                            </div>
+                            <div class="token-part-2">
+                                <div class="glass">
+                                    <div class="glass-reflex"></div>
+                                    <div class="token-content">
+                                        <p class="text-xs text-gray-300 uppercase tracking-widest">Your Token</p>
+                                        <p class="text-4xl font-extrabold" style="color:var(--primary-color);">${user.token}</p>
+                                        ${user.isPriority ? '<span class="text-xs text-blue-400">Priority (Fastest Queue)</span>' : ''}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-red-900/30 p-3 rounded-lg border border-red-700/50 mt-4">
+                        <p class="text-sm font-semibold text-red-300">Outstanding Udhar (Dues):</p>
+                        <p class="text-xl font-bold text-red-400">₹${APP_STATE.udharLedger[user.token] || 0}</p>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-2">
+                    <div class="canteen-card p-6 mb-8">
+                        <h3 class="text-2xl font-bold mb-4 text-white border-b pb-2 border-gray-700">Cafeteria Menu (Real-Time Stock)</h3>
+                        <div id="menu-list">
+                            ${menuHtml}
+                        </div>
+                    </div>
+
+                    <div class="canteen-card p-6">
+                        <h3 class="text-2xl font-bold mb-4 flex items-center">
+                            <i data-lucide="shopping-cart" class="w-6 h-6 mr-3 text-white"></i>
+                            Your Order Cart
+                        </h3>
+                        <div id="cart-items" class="min-h-[50px] text-center text-gray-500 p-4 border border-dashed border-gray-700 rounded-lg">
+                            Cart is empty. Add items above.
+                        </div>
+                        <div class="flex justify-between items-center mt-4 pt-4 border-t border-gray-700">
+                            <span class="text-xl font-bold">Total: <span id="cart-total" style="color:var(--primary-color);">₹0</span></span>
+                            <button onclick="placeOrder()" class="glow-button px-6 py-2 rounded-lg disabled:opacity-30 disabled:shadow-none" id="place-order-btn" disabled>
+                                Place Order
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            `;
+        }
+
+        function renderQueue() {
+            const user = APP_STATE.users[APP_STATE.currentUserId];
+            if (!user || user.role === 'Owner') return renderLogin();
+
+            const myOrderIndex = APP_STATE.orderQueue.findIndex(o => o.token === user.token);
+            const myOrder = myOrderIndex !== -1 ? APP_STATE.orderQueue[myOrderIndex] : null;
+
+            const allOrders = APP_STATE.orderQueue.slice().sort((a, b) => {
+                // Sort by status (Ready > In Prep > Queued)
+                const statusOrder = { 'Ready': 1, 'In Prep': 2, 'Queued': 3 };
+                
+                // Priority users (F-tokens) always come first
+                const aIsPrio = a.token.startsWith('F');
+                const bIsPrio = b.token.startsWith('F');
+
+                if (aIsPrio && !bIsPrio) return -1;
+                if (!aIsPrio && bIsPrio) return 1;
+
+                // Then sort by status
+                return statusOrder[a.status] - statusOrder[b.status];
+            });
+
+            const queueHtml = allOrders.map((order, index) => {
+                const isMine = order.token === user.token;
+                const statusColor = { 'Ready': 'text-green-400', 'In Prep': 'text-yellow-400', 'Queued': 'text-gray-400' };
+
+                return `
+                    <div class="flex justify-between items-center p-4 mb-3 rounded-lg ${isMine ? 'bg-blue-600/20 border-l-4 border-blue-400' : 'bg-gray-700/30'}">
+                        <div class="flex flex-col">
+                            <span class="text-2xl font-bold" style="color:${isMine ? 'var(--primary-color)' : 'white'};">#${order.token}</span>
+                            <span class="text-xs text-gray-400">${isMine ? 'Your Order' : '---'}</span>
+                        </div>
+                        <div class="text-right">
+                            <span class="font-semibold ${statusColor[order.status]}">${order.status}</span>
+                            <p class="text-sm text-gray-400">Pickup: ${order.eta}</p>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            return `
+            <div class="max-w-xl mx-auto">
+                <h2 class="text-3xl font-bold text-center mb-6">Real-Time Queue</h2>
+                <div class="canteen-card p-6">
+                    <h3 class="text-xl font-bold mb-4 border-b pb-2 border-gray-700">Your Current Status</h3>
+                    <div class="token-display p-4 rounded-lg mb-6 text-center ${!myOrder ? 'opacity-50' : ''}">
+                        ${myOrder ? `
+                            <p class="text-sm text-gray-400">Your Token is currently:</p>
+                            <p class="text-4xl font-extrabold mb-1" style="color:var(--primary-color);">${myOrder.token}</p>
+                            <p class="text-2xl font-semibold ${myOrder.status === 'Ready' ? 'text-green-400' : 'text-yellow-400'}">${myOrder.status}</p>
+                            <p class="text-sm text-gray-400">Estimated Pickup: ${myOrder.eta}</p>
+                            <button onclick="cancelOrder('${myOrder.token}', ${myOrder.id})" 
+                                class="w-full mt-4 py-2 text-sm text-red-300 border border-red-500/50 hover:bg-red-900/50 rounded-lg">
+                                <i data-lucide="x-circle" class="w-4 h-4 inline-block mr-2"></i>Cancel Full Order
+                            </button>
+                        ` : '<p class="text-gray-400">No active order found. Place an order on the "Order Now" tab.</p>'}
+                    </div>
+
+                    <h3 class="text-xl font-bold mb-4 border-b pb-2 border-gray-700">Full Queue List</h3>
+                    <div class="h-96 overflow-y-auto pr-2">
+                        ${queueHtml}
+                    </div>
+                </div>
+            </div>
+            `;
+        }
+        
+        // ... (renderLeaderboard and renderAccount remain largely the same, but the Udhar tracking logic is improved)
+
+        function renderLeaderboard() {
+            const user = APP_STATE.users[APP_STATE.currentUserId];
+            if (!user) return renderLogin();
+            
+            const sortedUsers = Object.values(APP_STATE.users)
+                .filter(u => u.role !== 'Owner') // Exclude owner from leaderboard
+                .sort((a, b) => b.ordersPlaced - a.ordersPlaced);
+
+            const leaderboardHtml = sortedUsers.slice(0, 10).map((user, index) => {
+                const rank = index + 1;
+                let badgeIcon = '';
+                if (rank === 1) badgeIcon = '<i data-lucide="award" class="w-5 h-5 text-yellow-400 mr-2 fill-yellow-400/50"></i>';
+                else if (rank === 2) badgeIcon = '<i data-lucide="award" class="w-5 h-5 text-gray-300 mr-2 fill-gray-300/50"></i>';
+                else if (rank === 3) badgeIcon = '<i data-lucide="award" class="w-5 h-5 text-orange-400 mr-2 fill-orange-400/50"></i>';
+                else badgeIcon = '<i data-lucide="hash" class="w-5 h-5 text-gray-500 mr-2"></i>';
+
+                return `
+                    <div class="leader-item flex justify-between items-center">
+                        <div class="flex items-center">
+                            <span class="w-6 text-lg font-bold mr-4 text-center ${rank <= 3 ? 'text-white' : 'text-gray-400'}">${rank}.</span>
+                            ${badgeIcon}
+                            <span class="font-semibold">${user.name}</span>
+                        </div>
+                        <span class="text-sm text-gray-300">${user.ordersPlaced} orders</span>
+                    </div>
+                `;
+            }).join('');
+
+            return `
+            <div class="max-w-lg mx-auto">
+                
+                <button class="leaderboard-btn-glow" onclick="setView('leaderboard')">
+                    <span>🏆 QUICKBITE FOODIE LEADERBOARD 🏆</span>
+                </button>
+                
+                <div class="canteen-card p-6">
+                    ${leaderboardHtml}
+                    <p class="text-center text-xs mt-4 text-gray-500">Udhar System & Stock Analytics are visible on the Canteen Dashboard only.</p>
+                </div>
+            </div>
+            `;
+        }
+       
+        function renderAccount() {
+            const user = APP_STATE.users[APP_STATE.currentUserId];
+            if (!user || user.role === 'Owner') return renderLogin();
+
+            return `
+            <div class="max-w-md mx-auto">
+                <h2 class="text-3xl font-bold text-center mb-6">Account & Settings</h2>
+                
+                <div class="settings-menu mb-6">
+                    <button class="settings-value">
+                        <i data-lucide="user-check"></i>
+                        <span>${user.name} (${user.id})</span>
+                    </button>
+                    <button class="settings-value">
+                        <i data-lucide="fingerprint"></i>
+                        <span>Permanent Token: <span style="color:var(--primary-color);">${user.token}</span></span>
+                    </button>
+                    <button class="settings-value">
+                        <i data-lucide="utensils"></i>
+                        <span>Total Orders: ${user.ordersPlaced}</span>
+                    </button>
+                </div>
+
+                <div class="canteen-card p-6 mb-6">
+                    <h3 class="text-xl font-bold mb-4 border-b pb-2 border-gray-700">Financial Ledger (Udhar)</h3>
+                    <div class="flex justify-between items-center bg-red-900/30 p-3 rounded-lg border border-red-700/50 mb-4">
+                        <span class="text-red-300 font-semibold">Pending Dues:</span>
+                        <span class="text-2xl font-bold text-red-400">₹${APP_STATE.udharLedger[user.token] || 0}</span>
+                    </div>
+                    <button class="login-btn w-full py-2 text-sm bg-green-600 hover:bg-green-500 disabled:opacity-50" 
+                            onclick="clearUdhar()" 
+                            ${(APP_STATE.udharLedger[user.token] || 0) <= 0 ? 'disabled' : ''}>
+                        Clear Dues Now (Simulated Payment)
+                    </button>
+                </div>
+                
+                <button onclick="logout()" class="w-full py-2 text-sm text-red-400 hover:text-red-300 transition-colors mt-4">
+                    Logout
+                </button>
+            </div>
+            `;
+        }
+
+        function renderOwnerDashboard() {
+            const user = APP_STATE.users[APP_STATE.currentUserId];
+            if (!user || user.role !== 'Owner') return renderLogin();
+
+            const totalUdhar = Object.values(APP_STATE.udharLedger).reduce((sum, amount) => sum + amount, 0);
+
+            const udharPeopleCount = Object.values(APP_STATE.udharLedger).filter(amount => amount > 0).length;
+
+            const activityFeedHtml = APP_STATE.activityFeed.slice(-5).reverse().map(activity => {
+                const color = activity.type === 'success' ? 'text-green-400' : (activity.type === 'error' ? 'text-red-400' : 'text-gray-400');
+                const icon = activity.type === 'success' ? 'check-square' : (activity.type === 'cancel' ? 'x-octagon' : 'info');
+                return `
+                    <div class="flex justify-between items-center p-3 mb-2 bg-gray-700/30 rounded-lg text-sm">
+                        <div class="flex items-center">
+                            <i data-lucide="${icon}" class="w-4 h-4 mr-2 ${color}"></i>
+                            <span class="${color}">${activity.message}</span>
+                        </div>
+                        <span class="text-xs text-gray-500">${activity.time}</span>
+                    </div>
+                `;
+            }).join('');
+
+            const queueHtml = APP_STATE.orderQueue.slice().sort((a, b) => {
+                const aIsPrio = a.token.startsWith('F');
+                const bIsPrio = b.token.startsWith('F');
+                if (aIsPrio && !bIsPrio) return -1;
+                if (!aIsPrio && bIsPrio) return 1;
+                const statusOrder = { 'Ready': 1, 'In Prep': 2, 'Queued': 3 };
+                return statusOrder[a.status] - statusOrder[b.status];
+            }).map(order => {
+                const statusColor = { 'Ready': 'bg-green-600', 'In Prep': 'bg-yellow-600', 'Queued': 'bg-blue-600' };
+                return `
+                    <div class="p-3 mb-2 border-l-4 border-gray-600 bg-gray-700/30 rounded-lg">
+                        <div class="flex justify-between items-center">
+                            <span class="text-lg font-bold">${order.token}</span>
+                            <span class="px-2 py-1 text-xs text-white rounded ${statusColor[order.status]}">${order.status}</span>
+                        </div>
+                        <p class="text-sm text-gray-400 mt-1">${order.items}</p>
+                        <p class="text-xs text-gray-500">Pickup by: ${order.eta}</p>
+                    </div>
+                `;
+            }).join('');
+
+            return `
+            <div class="max-w-4xl mx-auto">
+                <h2 class="text-3xl font-bold text-center mb-6 text-red-400">CANTEEN OWNER DASHBOARD</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div class="canteen-card p-4 bg-red-900/30 border-red-500/50">
+                        <p class="text-sm text-red-300">Total Udhar Pending</p>
+                        <p class="text-4xl font-extrabold text-red-400">₹${totalUdhar}</p>
+                        <p class="text-sm text-red-300">${udharPeopleCount} people have dues</p>
+                    </div>
+
+                    <div class="canteen-card p-4 bg-blue-900/30 border-blue-500/50">
+                        <p class="text-sm text-blue-300">Active Queue Size</p>
+                        <p class="text-4xl font-extrabold text-blue-400">${APP_STATE.orderQueue.length}</p>
+                        <p class="text-sm text-blue-300">Immediate Action Required</p>
+                    </div>
+
+                    <div class="canteen-card p-4 bg-yellow-900/30 border-yellow-500/50">
+                        <p class="text-sm text-yellow-300">Low Stock Items</p>
+                        <p class="text-4xl font-extrabold text-yellow-400">${APP_STATE.menu.filter(i => i.stock <= 10).length}</p>
+                        <p class="text-sm text-yellow-300">Items below 10 units</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="canteen-card p-6">
+                        <h3 class="text-xl font-bold mb-4 border-b pb-2 border-gray-700">Live Order Queue (Priority Sorted)</h3>
+                        <div class="h-96 overflow-y-auto pr-2">
+                            ${queueHtml.length > 0 ? queueHtml : '<p class="text-gray-500">The queue is currently empty!</p>'}
+                        </div>
+                    </div>
+
+                    <div class="canteen-card p-6">
+                        <h3 class="text-xl font-bold mb-4 border-b pb-2 border-gray-700">Real-time Activity Feed</h3>
+                        <div class="h-96 overflow-y-auto pr-2">
+                            ${activityFeedHtml.length > 0 ? activityFeedHtml : '<p class="text-gray-500">No recent activity.</p>'}
+                        </div>
+                    </div>
+                </div>
+                
+                <button onclick="logout()" class="w-full py-2 text-sm text-red-400 hover:text-red-300 transition-colors mt-4">
+                    Logout (Owner)
+                </button>
+            </div>
+            `;
+        }
+
+
+        // --- CORE LOGIC ---
+
+        let cart = [];
+
+        function addToCart(itemId) {
+            const item = APP_STATE.menu.find(i => i.id === itemId);
+            if (item && item.stock > (cart.find(c => c.id === itemId)?.quantity || 0)) { // Check stock against cart quantity
+                const cartItem = cart.find(c => c.id === itemId);
+                if (cartItem) {
+                    cartItem.quantity++;
+                } else {
+                    cart.push({ ...item, quantity: 1 });
+                }
+                updateCartUI();
+                showMessage(`${item.name} added to cart!`, 'info');
+            } else {
+                showMessage(`Sorry, max stock (${item.stock}) reached for ${item.name}.`, 'error');
+            }
+        }
+
+        function removeFromCart(itemId) {
+            const cartItemIndex = cart.findIndex(c => c.id === itemId);
+            if (cartItemIndex !== -1) {
+                const cartItem = cart[cartItemIndex];
+                cartItem.quantity--;
+                showMessage(`Removed one ${cartItem.name} from cart.`, 'info');
+                if (cartItem.quantity <= 0) {
+                    cart.splice(cartItemIndex, 1);
+                }
+            }
+            updateCartUI();
+        }
+
+        function updateCartUI() {
+            const cartItemsContainer = document.getElementById('cart-items');
+            const cartTotalSpan = document.getElementById('cart-total');
+            const placeOrderBtn = document.getElementById('place-order-btn');
+            
+            let total = 0;
+            if (cart.length === 0) {
+                cartItemsContainer.innerHTML = 'Cart is empty. Add items above.';
+                cartTotalSpan.textContent = '₹0';
+                if (placeOrderBtn) placeOrderBtn.disabled = true;
+                return;
+            }
+
+            const cartHtml = cart.map(item => {
+                total += item.price * item.quantity;
+                return `
+                    <div class="flex justify-between items-center bg-gray-700/50 p-3 rounded-lg mb-2">
+                        <span class="text-white">${item.name} x ${item.quantity}</span>
+                        <div class="flex items-center space-x-3">
+                            <span class="text-sm text-gray-300 font-bold">₹${item.price * item.quantity}</span>
+                            <button onclick="removeFromCart('${item.id}')" class="text-red-400 hover:text-red-500 p-1 rounded-full">
+                                <i data-lucide="minus-circle" class="w-5 h-5"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            cartItemsContainer.innerHTML = cartHtml;
+            cartTotalSpan.textContent = `₹${total}`;
+            if (placeOrderBtn) placeOrderBtn.disabled = false;
+            lucide.createIcons(); // Re-render lucide icons
+        }
+        
+        function placeOrder() {
+            if (cart.length === 0) return;
+
+            const user = APP_STATE.users[APP_STATE.currentUserId];
+            const orderItems = cart.map(item => `${item.name} x${item.quantity}`).join(', ');
+            const totalAmount = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            
+            // 1. Dynamic ETA Calculation (Max 15 minutes)
+            const baseTime = user.isPriority ? 3 : 5; // 3 min for faculty, 5 min for student
+            const prepTime = totalItems * 2; // 2 minutes per item
+            let totalWait = baseTime + prepTime;
+            
+            // Capping at 15 minutes
+            if (totalWait > 15) {
+                totalWait = 15;
+            }
+
+            const etaDate = new Date();
+            etaDate.setMinutes(etaDate.getMinutes() + totalWait);
+            const etaString = etaDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+
+            // 2. Stock Decrease (Simulated)
+            cart.forEach(cartItem => {
+                const menuItem = APP_STATE.menu.find(m => m.id === cartItem.id);
+                if (menuItem) menuItem.stock -= cartItem.quantity;
+            });
+
+            // 3. Udhar Option (Simulated: Auto-credit if large order or random chance)
+            let paymentNote = "Paid in cash/digital.";
+            if (totalAmount > 100 || Math.random() < 0.2) { // Udhar for orders > 100 OR 20% chance
+                APP_STATE.udharLedger[user.token] = (APP_STATE.udharLedger[user.token] || 0) + totalAmount;
+                paymentNote = `Payment recorded as **Udhar** (₹${totalAmount} added to your dues).`;
+            }
+
+            // 4. Update Queue
+            APP_STATE.orderQueue.push({
+                token: user.token,
+                items: orderItems,
+                status: 'Queued',
+                eta: etaString,
+                id: Date.now() // Unique ID for cancellation
+            });
+
+            // 5. Update User Stats
+            user.ordersPlaced++;
+
+            // 6. Clear Cart & Show Success
+            cart = [];
+            
+            showMessage(`Order Placed! Token: **${user.token}**. Pickup time: **${etaString}** (${paymentNote})`, 'success');
+            setView('queue'); // Switch to queue view to see the new order
+        }
+
+        function cancelOrder(token, orderId) {
+            const orderIndex = APP_STATE.orderQueue.findIndex(o => o.id === orderId && o.token === token);
+            if (orderIndex === -1) {
+                showMessage('Error: Order not found or already processed.', 'error');
+                return;
+            }
+
+            const canceledOrder = APP_STATE.orderQueue.splice(orderIndex, 1)[0];
+            const user = APP_STATE.users[APP_STATE.currentUserId];
+
+            // Simulate stock refund (by parsing the items string) - Simplistic for simulation
+            canceledOrder.items.split(', ').forEach(itemString => {
+                const [name, quantityStr] = itemString.split(' x');
+                const quantity = parseInt(quantityStr);
+                const menuItem = APP_STATE.menu.find(m => m.name === name.trim());
+                if (menuItem) {
+                    menuItem.stock += quantity;
+                }
+            });
+
+            // Add activity feed entry
+            APP_STATE.activityFeed.push({
+                time: new

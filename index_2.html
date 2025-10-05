@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -1084,4 +1084,125 @@
 
             // Add activity feed entry
             APP_STATE.activityFeed.push({
-                time: new
+                time: new Date().toLocaleTimeString('en-US'),
+                type: 'cancel',
+                message: `Order **${canceledOrder.token}** canceled by ${user.name}. Items refunded.`
+            });
+            
+            showMessage(`Order ${canceledOrder.token} successfully canceled. Items and stock refunded.`, 'info');
+            setView('queue');
+        }
+
+        function clearUdhar() {
+            const user = APP_STATE.users[APP_STATE.currentUserId];
+            const amount = APP_STATE.udharLedger[user.token] || 0;
+            if (amount > 0) {
+                APP_STATE.udharLedger[user.token] = 0;
+                
+                // Add activity feed entry
+                APP_STATE.activityFeed.push({
+                    time: new Date().toLocaleTimeString('en-US'),
+                    type: 'success',
+                    message: `Payment **₹${amount}** completed by ${user.name} (${user.token}).`
+                });
+
+                showMessage(`Dues of ₹${amount} cleared successfully! Payment reflected in Owner Dashboard.`, 'success');
+                setView('account');
+            } else {
+                showMessage('You have no outstanding dues!', 'info');
+            }
+        }
+
+        function logout() {
+            APP_STATE.currentUserId = null;
+            showMessage('You have been logged out.', 'info');
+            setView('login');
+        }
+
+
+        // --- UTILITY & VIEW SWITCHING ---
+        
+        let currentView = 'login'; 
+
+        function setView(viewName) {
+            currentView = viewName;
+            const viewContainer = document.getElementById('view-container');
+            let htmlContent = '';
+
+            // Guard against navigating to user views while logged in as owner
+            const user = APP_STATE.users[APP_STATE.currentUserId];
+            if (user && user.role === 'Owner' && ['order', 'queue', 'leaderboard', 'account'].includes(viewName)) {
+                 viewName = 'owner';
+            }
+            // Ensure login/owner is not blocked
+            if (viewName !== 'login' && viewName !== 'owner' && !APP_STATE.currentUserId) {
+                 viewName = 'login';
+            }
+
+
+            switch(viewName) {
+                case 'order':
+                    htmlContent = renderOrder();
+                    break;
+                case 'queue':
+                    htmlContent = renderQueue();
+                    break;
+                case 'leaderboard':
+                    htmlContent = renderLeaderboard();
+                    break;
+                case 'account':
+                    htmlContent = renderAccount();
+                    break;
+                case 'owner':
+                    htmlContent = renderOwnerDashboard();
+                    break;
+                case 'login':
+                default:
+                    htmlContent = renderLogin();
+                    break;
+            }
+
+            viewContainer.innerHTML = htmlContent;
+            lucide.createIcons(); // Initialize Lucide icons on the new content
+            
+            // Re-check and update cart UI if order view is loaded
+            if (viewName === 'order') {
+                updateCartUI();
+            }
+        }
+
+        // Custom Message Box (No Alerts!)
+        function showMessage(message, type) {
+            const existingMessage = document.getElementById('app-message');
+            if (existingMessage) existingMessage.remove();
+
+            const bgColor = type === 'success' ? 'bg-green-600' : (type === 'error' ? 'bg-red-600' : (type === 'cancel' ? 'bg-orange-600' : 'bg-blue-600'));
+            const icon = type === 'success' ? 'check-circle' : (type === 'error' ? 'x-circle' : (type === 'cancel' ? 'alert-triangle' : 'info'));
+
+            const msgHtml = document.createElement('div');
+            msgHtml.id = 'app-message';
+            msgHtml.className = `fixed top-4 left-1/2 transform -translate-x-1/2 p-4 rounded-lg shadow-xl text-white z-[100] transition-all duration-300 flex items-center ${bgColor}`;
+            msgHtml.innerHTML = `<i data-lucide="${icon}" class="w-5 h-5 mr-3"></i> ${message}`;
+            
+            document.body.appendChild(msgHtml);
+            lucide.createIcons();
+
+            setTimeout(() => {
+                const msg = document.getElementById('app-message');
+                if (msg) {
+                    msg.classList.add('opacity-0', 'translate-y-[-20px]');
+                    setTimeout(() => msg.remove(), 300);
+                }
+            }, 5000);
+        }
+
+        // --- INITIALIZATION ---
+        window.onload = () => {
+            // Force login view at start
+            APP_STATE.currentUserId = null;
+            setView('login');
+        };
+
+    </script>
+</body>
+</html>

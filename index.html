@@ -4,41 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>QuickBite - Dynamic Canteen Order System</title>
-    <script src="https://cdn.tailwindcss.com">
-// Helper: return image URL for a menu item, or fallback placeholder
-function getImageFor(item) {
-    if (getImageFor(item)) return getImageFor(item);
-    // small public placeholder for missing product images
-    return 'https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png';
-}
-
-// Token generators
-function generateStudentTokenFromRoll(roll) {
-    if (!roll) return 'S-000';
-    // try to parse: digits + letters + digits, take last two letters from letters part as dept, and last two digits from trailing numbers
-    const m = roll.match(/(\d{2})([A-Z]+)(\d+)/i);
-    if (m) {
-        const letters = m[2].toUpperCase();
-        const trailing = m[3];
-        const dept = letters.slice(-2);
-        const lastN = trailing.slice(-2);
-        return dept + '-' + lastN;
-    }
-    // fallback: S- + last 3 digits
-    const last = roll.replace(/\D/g,'').slice(-2);
-    return 'S-' + (last || '00');
-}
-
-function generateOwnerTokenByIndex(idx) {
-    // idx is 1-based index; map to letter A..Z cyclically and three-digit number equal to idx padded
-    const letterIndex = (idx - 1) % 26;
-    const letter = String.fromCharCode(65 + letterIndex);
-    const num = String(idx).padStart(3,'0');
-    return letter + '-' + num;
-}
-
-</script>
+    <!-- Tailwind CSS is loaded correctly here -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
     <link href="https://fonts.googleapis.com/css2?family=Times+New+Roman:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Icons from Lucide -->
     <script src="https://unpkg.com/lucide@latest"></script>
 
     <style>
@@ -472,6 +442,19 @@ function generateOwnerTokenByIndex(idx) {
             border-left: 5px solid var(--primary-color);
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
         }
+        
+        /* New: Token Frame Glow Toggle */
+        @keyframes subtleGlow {
+            0% { box-shadow: 0 0 10px rgba(255, 250, 240, 0.2); }
+            50% { box-shadow: 0 0 20px rgba(255, 250, 240, 0.5); }
+            100% { box-shadow: 0 0 10px rgba(255, 250, 240, 0.2); }
+        }
+
+        #tokenFrame.active-glow {
+            animation: subtleGlow 1.5s infinite alternate;
+        }
+        /* End New Style */
+
 
         .leader-item {
             border-radius: 8px;
@@ -550,9 +533,129 @@ function generateOwnerTokenByIndex(idx) {
             color: var(--primary-color);
             box-shadow: 0 1px 5px rgba(0, 0, 0, 0.5);
         }
+
+        /* 🌟 Lamp Animation Overlay */
+        #loginAnimationOverlay {
+          position: fixed;
+          inset: 0;
+          background: rgba(10, 10, 20, 0.92);
+          z-index: 99999;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          flex-direction: column;
+          overflow: hidden;
+        }
+        .overlay-bg {
+          position: absolute;
+          inset: 0;
+          background: radial-gradient(circle at center, rgba(255,255,255,0.06), rgba(0,0,0,0.95));
+          z-index: 1;
+        }
+        .lamp-container {
+          z-index: 2;
+          text-align: center;
+          animation: fadeIn 0.6s ease forwards;
+        }
+        .lamp {
+          position: relative;
+          width: 120px;
+          height: 200px;
+          margin: 0 auto;
+          animation: swing 2s ease-in-out infinite;
+        }
+        .cable {
+          position: absolute;
+          top: 0;
+          left: 50%;
+          width: 4px;
+          height: 80px;
+          background: #222;
+          transform: translateX(-50%);
+        }
+        .cover {
+          position: absolute;
+          top: 70px;
+          left: 50%;
+          width: 70px;
+          height: 40px;
+          background: #111;
+          border-radius: 50% 50% 10px 10px;
+          transform: translateX(-50%);
+        }
+        .light {
+          position: absolute;
+          top: 110px;
+          left: 50%;
+          width: 100px;
+          height: 100px;
+          background: radial-gradient(circle at center, rgba(255,215,100,0.8), rgba(255,200,0,0));
+          transform: translateX(-50%);
+          border-radius: 50%;
+          opacity: 0;
+          animation: lightGlow 2s ease-in-out infinite;
+        }
+        .token-box {
+          z-index: 3;
+          background: #fff8dc;
+          color: #111;
+          font-weight: bold;
+          font-size: 1.4rem;
+          border-radius: 12px;
+          padding: 10px 25px;
+          margin-top: 20px;
+          display: inline-block;
+          box-shadow: 0 0 15px rgba(255,255,200,0.8);
+          opacity: 0;
+          transform: scale(0.8);
+          animation: popUp 1s ease forwards 2s;
+        }
+        .animation-text {
+          color: #f1f1f1;
+          font-size: 0.9rem;
+          margin-top: 12px;
+          opacity: 0;
+          animation: fadeIn 0.8s ease forwards 2.5s;
+        }
+        /* Animations */
+        @keyframes swing {
+          0% { transform: rotate(-3deg); }
+          50% { transform: rotate(3deg); }
+          100% { transform: rotate(-3deg); }
+        }
+        @keyframes lightGlow {
+          0%, 100% { opacity: 0.6; }
+          50% { opacity: 1; }
+        }
+        @keyframes fadeIn {
+          to { opacity: 1; }
+        }
+        @keyframes popUp {
+          to { opacity: 1; transform: scale(1); }
+        }
+        @keyframes fadeOut {
+          to { opacity: 0; visibility: hidden; }
+        }
     </style>
 </head>
-<body onload="setView('login')">
+<body>
+<!-- 🔆 Login/Register Lamp Animation Overlay -->
+<div id="loginAnimationOverlay" style="display:none;">
+  <div class="overlay-bg"></div>
+  <div class="lamp-container">
+    <div class="lamp">
+      <div class="cable"></div>
+      <div class="cover"></div>
+      <div class="light"></div>
+    </div>
+    <div class="token-box">
+      <span id="animatedToken">--</span>
+    </div>
+    <p class="animation-text">Generating your token...</p>
+  </div>
+</div>
+
+<!-- Token display frame (animated) -->
 <style>
 #tokenFrame {
   position: fixed;
@@ -567,53 +670,9 @@ function generateOwnerTokenByIndex(idx) {
   z-index: 2000;
   text-align:center;
 }
-#tokenFrame h4 { margin: 6px 0 8px; font-size:14px; color:#333; }
-#tokenNumber {
-  font-size: 32px;
-  font-weight: 700;
-  padding: 8px 0;
-  border-radius: 8px;
-  background: #111;
-  color: #fff;
-  display: inline-block;
-  min-width: 110px;
-  transform-origin: center;
-  opacity: 0;
-  transform: translateY(12px) scale(0.95);
-  transition: all 420ms cubic-bezier(.2,.9,.3,1);
-}
-#tokenNumber.show {
-  opacity: 1;
-  transform: translateY(0) scale(1);
-}
-#tokenLight {
-  width: 18px; height:18px;
-  border-radius:50%;
-  margin: 10px auto 0;
-  box-shadow: 0 0 0 rgba(255,200,60,0);
-  transition: box-shadow 300ms ease;
-}
-#tokenLight.on {
-  box-shadow: 0 0 18px rgba(255,200,60,0.9);
-  animation: pulse 900ms infinite;
-}
-@keyframes pulse {
-  0% { box-shadow: 0 0 6px rgba(255,200,60,0.6); }
-  50% { box-shadow: 0 0 18px rgba(255,200,60,0.9); }
-  100% { box-shadow: 0 0 6px rgba(255,200,60,0.6); }
-}
-#tokenFrame button {
-  margin-top:8px;
-  border: none;
-  background: linear-gradient(90deg,#0ea5a4,#0284c7);
-  color: #fff;
-  padding: 8px 12px;
-  border-radius: 8px;
-  cursor: pointer;
-}
 </style>
 
-<div id="tokenFrame" aria-live="polite">
+<div id="tokenFrame" aria-live="polite" style="display:none;">
   <h4>Your Order Token</h4>
   <div id="tokenNumber" aria-hidden="true">---</div>
   <div id="tokenLight" title="status light"></div>
@@ -623,6 +682,7 @@ function generateOwnerTokenByIndex(idx) {
 </div>
 
 
+<!-- Owner dashboard panel -->
 <style>
 #ownerPanel { position: fixed; left: 18px; bottom: 18px; width: 360px; max-height:60vh; overflow:auto; background:#fff;border-radius:10px;padding:10px;box-shadow:0 10px 30px rgba(0,0,0,0.12);z-index:2000; font-family:sans-serif;}
 #ownerPanel h4 { margin:6px 0; }
@@ -716,41 +776,7 @@ function ownerCancelOrder(orderId) {
 }
 </script>
 
-<script>
-// showTokenAnimated(token) will show the token and toggle light on repeated clicks
-function showTokenAnimated(token) {
-  const num = document.getElementById('tokenNumber');
-  const light = document.getElementById('tokenLight');
-  const btn = document.getElementById('tokenBtn');
-  num.textContent = token;
-  // entrance animation
-  setTimeout(() => num.classList.add('show'), 10);
-  // make light blink once after showing
-  light.classList.add('on');
-  setTimeout(() => light.classList.remove('on'), 2500);
-  // change button behavior: next clicks toggle light "on" (show animation light)
-  btn.onclick = () => {
-    light.classList.toggle('on');
-  };
-}
-
-// initial button hook: if clicked without recent order, show placeholder token briefly
-document.getElementById('tokenBtn').addEventListener('click', function(){
-  const current = document.getElementById('tokenNumber').textContent;
-  if (!current || current==='---') {
-    // show demo token then clear
-    showTokenAnimated('T-000');
-    setTimeout(()=>{
-      // keep displayed, but do nothing else
-    }, 800);
-  } else {
-    // toggle light
-    document.getElementById('tokenLight').classList.toggle('on');
-  }
-});
-</script>
-
-
+    <!-- Loading Overlay -->
     <div id="loading-overlay" class="loading hidden">
         <svg height="48px" width="64px">
             <polyline id="back" points="0.157 23.954, 14 23.954, 21.843 48, 43 0, 50 24, 64 24"></polyline>
@@ -759,6 +785,7 @@ document.getElementById('tokenBtn').addEventListener('click', function(){
     </div>
 
     <div id="app" class="w-full max-w-5xl">
+        <!-- Main Content Area -->
         <header class="text-center mb-8">
             <h1 class="text-5xl font-bold tracking-widest text-white mb-2" style="text-shadow: 0 0 10px var(--primary-color);">
                 QUICKBITES
@@ -766,9 +793,13 @@ document.getElementById('tokenBtn').addEventListener('click', function(){
             <p class="text-gray-400 text-lg">Smart Canteen Order System</p>
         </header>
 
+        <!-- Dynamic View Container -->
+        <!-- Added extra padding to ensure content is visible above the fixed navbar -->
         <div id="view-container" class="transition-all duration-500 pb-20 md:pb-24"> 
-            </div>
+            <!-- Content will be injected here -->
+        </div>
 
+        <!-- Navigation Bar (Hidden on login/owner views, controlled by setView logic) -->
         <nav id="navbar" class="fixed bottom-0 left-0 right-0 p-4 bg-gray-900 border-t border-gray-700 shadow-2xl z-50 hidden">
             <div class="flex justify-around max-w-xl mx-auto">
                 <button onclick="setView('order')" class="icon-container flex flex-col items-center text-sm p-2 rounded-lg text-gray-400 hover:text-white transition-colors">
@@ -796,6 +827,40 @@ document.getElementById('tokenBtn').addEventListener('click', function(){
     </div>
 
     <script>
+        // --- Helper functions ---
+        
+        // Helper: return image URL for a menu item, or fallback placeholder
+        function getImageFor(item) {
+            // This function is still present for backwards compatibility if needed, but the menu items now have direct image URLs.
+            // if (getImageFor(item)) return getImageFor(item); <-- Removed recursive call which would lead to stack overflow
+            return 'https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png';
+        }
+
+        // Token generators
+        function generateStudentTokenFromRoll(roll) {
+            if (!roll) return 'S-000';
+            // try to parse: digits + letters + digits, take last two letters from letters part as dept, and last two digits from trailing numbers
+            const m = roll.match(/(\d{2})([A-Z]+)(\d+)/i);
+            if (m) {
+                const letters = m[2].toUpperCase();
+                const trailing = m[3];
+                const dept = letters.slice(-2);
+                const lastN = trailing.slice(-2);
+                return dept + '-' + lastN;
+            }
+            // fallback: S- + last 3 digits
+            const last = roll.replace(/\D/g,'').slice(-2);
+            return 'S-' + (last || '00');
+        }
+
+        function generateOwnerTokenByIndex(idx) {
+            // idx is 1-based index; map to letter A..Z cyclically and three-digit number equal to idx padded
+            const letterIndex = (idx - 1) % 26;
+            const letter = String.fromCharCode(65 + letterIndex);
+            const num = String(idx).padStart(3,'0');
+            return letter + '-' + num;
+        }
+
         // --- DATA / STATE MANAGEMENT (Simulated) ---
 
         const APP_STATE = {
@@ -811,23 +876,23 @@ document.getElementById('tokenBtn').addEventListener('click', function(){
 
             menu: [
                 // Fast Prep Items (30 seconds = 0.5 min)
-                { id: 'samosa', name: 'Samosa', price: 20, stock: 25, prepTime: 0.5, category: 'cooked' },
-                { id: 'daalkachori', name: 'Daal Kachori', price: 25, stock: 15, prepTime: 0.5, category: 'cooked' },
-                { id: 'mirchivada', name: 'Mirchivada', price: 30, stock: 10, prepTime: 0.5, category: 'cooked' },
-                { id: 'pyazkachori', name: 'Pyaz Kachori', price: 25, stock: 12, prepTime: 0.5, category: 'cooked' },
+                { id: 'samosa', name: 'Samosa', price: 20, stock: 25, prepTime: 0.5, category: 'cooked', image: 'https://placehold.co/100x100/34D399/1F2937?text=Samosa' },
+                { id: 'daalkachori', name: 'Daal Kachori', price: 25, stock: 15, prepTime: 0.5, category: 'cooked', image: 'https://placehold.co/100x100/FBBF24/1F2937?text=Daal+Kachori' },
+                { id: 'mirchivada', name: 'Mirchivada', price: 30, stock: 10, prepTime: 0.5, category: 'cooked', image: 'https://placehold.co/100x100/F87171/1F2937?text=Mirchi+Vada' },
+                { id: 'pyazkachori', name: 'Pyaz Kachori', price: 25, stock: 12, prepTime: 0.5, category: 'cooked', image: 'https://placehold.co/100x100/93C5FD/1F2937?text=Pyaz+Kachori' },
                 
                 // Slow Prep Items (10 minutes)
-                { id: 'maggi', name: 'Maggi', price: 50, stock: 8, prepTime: 10, category: 'cooked' },
+                { id: 'maggi', name: 'Maggi', price: 50, stock: 8, prepTime: 10, category: 'cooked', image: 'https://placehold.co/100x100/60A5FA/1F2937?text=Maggi' },
 
                 // Standard Prep Items (2 minutes)
-                { id: 'tea', name: 'Masala Tea', price: 15, stock: 99, prepTime: 2, category: 'drink' },
-                { id: 'sandwich', name: 'Grilled Sandwich', price: 75, stock: 0, prepTime: 2, category: 'cooked' },
+                { id: 'tea', name: 'Masala Tea', price: 15, stock: 99, prepTime: 2, category: 'drink', image: 'https://placehold.co/100x100/FCA5A5/1F2937?text=Masala+Tea' },
+                { id: 'sandwich', name: 'Grilled Sandwich', price: 75, stock: 0, prepTime: 2, category: 'cooked', image: 'https://placehold.co/100x100/A78BFA/1F2937?text=Sandwich' },
 
                 // Packaged/Instant Items (0 minutes)
-                { id: 'lays', name: 'Lays Wafers', price: 20, stock: 50, prepTime: 0, category: 'packet' },
-                { id: 'kurkure', name: 'Kurkure', price: 20, stock: 40, prepTime: 0, category: 'packet', image: 'https://upload.wikimedia.org/wikipedia/commons/1/15/Potato_Chips%2C_Lays_and_Kurkure.jpg' },
-                { id: 'balaji', name: 'Balaji Sev', price: 25, stock: 30, prepTime: 0, category: 'packet' },
-                { id: 'segar', name: 'Seegar Chips', price: 20, stock: 45, prepTime: 0, category: 'packet' },
+                { id: 'lays', name: 'Lays Wafers', price: 20, stock: 50, prepTime: 0, category: 'packet', image: 'https://placehold.co/100x100/FFFAF0/1F2937?text=Lays' },
+                { id: 'kurkure', name: 'Kurkure', price: 20, stock: 40, prepTime: 0, category: 'packet', image: 'https://placehold.co/100x100/06B6D4/1F2937?text=Kurkure' },
+                { id: 'balaji', name: 'Balaji Sev', price: 25, stock: 30, prepTime: 0, category: 'packet', image: 'https://placehold.co/100x100/FCD34D/1F2937?text=Balaji+Sev' },
+                { id: 'segar', name: 'Seegar Chips', price: 20, stock: 45, prepTime: 0, category: 'packet', image: 'https://placehold.co/100x100/C084FC/1F2937?text=Seegar+Chips' },
             ],
 
             orderQueue: [
@@ -945,7 +1010,9 @@ function logout() {
     APP_STATE.currentUserId = null;
     // hide token display
     const num = document.getElementById('tokenNumber');
+    const frame = document.getElementById('tokenFrame');
     if (num) { num.textContent = '---'; num.classList.remove('show'); }
+    if (frame) { frame.style.display = 'none'; frame.classList.remove('active-glow'); }
     showMessage('Logged out successfully.', 'success');
     setView('login');
 }
@@ -1033,6 +1100,29 @@ function setView(viewName) {
                 setTimeout(() => msgHtml.remove(), 300);
             }, 5000);
         }
+
+        // 🌟 Lamp Animation Function
+        function showLoginAnimation(token, callback) {
+          const overlay = document.getElementById("loginAnimationOverlay");
+          const tokenSpan = document.getElementById("animatedToken");
+
+          // Reset previous state and display overlay
+          overlay.style.animation = "";
+          overlay.style.opacity = 1;
+          overlay.style.display = "flex";
+          document.body.style.overflow = "hidden";
+          tokenSpan.textContent = token || "--";
+
+          // Hide after 4 seconds and show main content
+          setTimeout(() => {
+            overlay.style.animation = "fadeOut 1s forwards";
+            setTimeout(() => {
+              overlay.style.display = "none";
+              document.body.style.overflow = "auto";
+              if (callback) callback();
+            }, 900);
+          }, 4000);
+        }
         
         // --- AUTHENTICATION / REGISTRATION ---
 
@@ -1099,12 +1189,16 @@ function setView(viewName) {
             APP_STATE.udharLedger[token] = 0;
             APP_STATE.currentUserId = id;
 
-            showMessage(`Registration successful! Your token is ${token}.`, 'success');
-            setView(role === 'Owner' ? 'owner' : 'order');
+            // Trigger animation before setting view
+            showLoginAnimation(token, () => {
+                showMessage(`Registration successful! Your token is ${token}.`, 'success');
+                setView(role === 'Owner' ? 'owner' : 'order');
+            });
         }
 
         function handleLogin(role, password) {
             let id, user;
+            let tokenToUse;
 
             if (role === 'Student') {
                 const idInput = document.getElementById('rollNumberLogin');
@@ -1115,40 +1209,34 @@ function setView(viewName) {
                     return showMessage('Please enter your Name, Roll Number, and Password.', 'error');
                 }
                 
-                // Find user by ID first
                 user = APP_STATE.users[id];
 
-                // Additional check: Name validation for student login
                 if (!user || user.password !== password || user.role !== role || user.name !== studentName) {
                     return showMessage('Login failed: Invalid Name, Roll Number, or Password.', 'error');
                 }
+                tokenToUse = user.token;
 
             } else { // Owner
                 id = document.getElementById('ownerId').value.trim();
                 if (!id || !password) {
                     return showMessage('Please enter your Owner ID and Password.', 'error');
                 }
-                // Owner ids are expected to begin with 'O' (e.g. O101) but we let the lookup validate existence below.
                  user = APP_STATE.users[id];
+                 if (!user || user.password !== password || user.role !== role) {
+                    return showMessage('Login failed: Invalid ID/Roll Number or Password.', 'error');
+                }
+                tokenToUse = user.token;
             }
             
-            if (!user || user.password !== password || user.role !== role) {
-                return showMessage('Login failed: Invalid ID/Roll Number or Password.', 'error');
-            }
-
             APP_STATE.currentUserId = id;
-            showMessage(`Welcome back, ${user.name}!`, 'success');
-            setView(user.role === 'Owner' ? 'owner' : 'order');
+            
+            // Trigger animation before setting view
+            showLoginAnimation(tokenToUse, () => {
+                showMessage(`Welcome back, ${user.name}!`, 'success');
+                setView(user.role === 'Owner' ? 'owner' : 'order');
+            });
         }
         
-        function logout() {
-            APP_STATE.currentUserId = null;
-            // Clear cart on logout
-            cart = []; 
-            showMessage('You have been logged out.', 'info');
-            setView('login');
-        }
-
         // --- ORDERING LOGIC ---
         
         function addToCart(itemId) {
@@ -1579,11 +1667,13 @@ function placeOrder() {
             <div class="login-card mx-auto">
                 <h4 class="login-title">Access QuickBites</h4>
 
+                <!-- Login/Register Toggle -->
                 <div class="toggle-btn-group">
                     <button class="toggle-btn ${isLogin ? 'active' : ''}" onclick="setAuthMode('login')">LOGIN</button>
                     <button class="toggle-btn ${!isLogin ? 'active' : ''}" onclick="setAuthMode('register')">REGISTER</button>
                 </div>
                 
+                <!-- Dynamic Role Selection -->
                 <div class="mb-6">
                     <h5 class="text-sm text-gray-400 mb-2">Select your role:</h5>
                     <div class="radio-container mx-auto max-w-[250px]">
@@ -1624,41 +1714,37 @@ function placeOrder() {
             const cookedMenu = APP_STATE.menu.filter(i => i.category !== 'packet');
             const packetMenu = APP_STATE.menu.filter(i => i.category === 'packet');
 
-            // Map item ID to a descriptive placeholder text/color for "real" images
-            const imagePlaceholders = {
-                'lays': { text: 'Potato Wafers', color: 'bg-red-400' },
-                'kurkure': { text: 'Puff Snack', color: 'bg-yellow-400' },
-                'balaji': { text: 'Sev', color: 'bg-green-400' },
-                'segar': { text: 'Salt Chips', color: 'bg-blue-400' }
-            };
-
             const cookedMenuHtml = cookedMenu.map(item => `
-                <div class="flex justify-between items-center p-3 mb-3 border-b border-gray-700 last:border-b-0 ${item.stock <= 0 ? 'opacity-50' : ''}">
-                    <div class="flex flex-col">
-                        <span class="text-lg font-semibold">${item.name}</span>
-                        <span class="text-sm text-gray-400">₹${item.price} | Prep: ${item.prepTime * 60}s</span>
-                    </div>
-                    <div class="flex items-center">
-                        <span class="text-sm mr-4 ${item.stock > 10 ? 'text-green-400' : (item.stock > 0 ? 'text-yellow-400' : 'text-red-500')}">
-                            ${item.stock > 0 ? `${item.stock} left` : 'Out of Stock ❌'}
-                        </span>
-                        <button onclick="addToCart('${item.id}')" 
-                                class="quantity-btn w-10 h-10 flex items-center justify-center disabled:opacity-30" 
-                                ${item.stock <= 0 ? 'disabled' : ''}>
-                            <i data-lucide="plus" class="w-5 h-5"></i>
-                        </button>
+                <div class="flex items-start p-3 mb-3 border-b border-gray-700 last:border-b-0 ${item.stock <= 0 ? 'opacity-50' : ''}">
+                    <!-- Added Image Thumbnail -->
+                    <img src="${item.image}" alt="${item.name}" class="w-16 h-16 rounded-lg mr-4 object-cover border border-gray-600 flex-shrink-0">
+                    <div class="flex-grow flex justify-between items-center">
+                        <div class="flex flex-col">
+                            <span class="text-lg font-semibold">${item.name}</span>
+                            <span class="text-sm text-gray-400">₹${item.price} | Prep: ${item.prepTime * 60}s</span>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="text-sm mr-4 ${item.stock > 10 ? 'text-green-400' : (item.stock > 0 ? 'text-yellow-400' : 'text-red-500')}">
+                                ${item.stock > 0 ? `${item.stock} left` : 'Out of Stock ❌'}
+                            </span>
+                            <button onclick="addToCart('${item.id}')" 
+                                    class="quantity-btn w-10 h-10 flex items-center justify-center disabled:opacity-30" 
+                                    ${item.stock <= 0 ? 'disabled' : ''}>
+                                <i data-lucide="plus" class="w-5 h-5"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
             `).join('');
 
             const packetMenuHtml = packetMenu.map((item, index) => {
-                const placeholder = imagePlaceholders[item.id] || { text: 'Snack', color: 'bg-gray-400' };
-                const bgColor = placeholder.color.replace('bg-', '');
                 return `
                     <div class="flex flex-col items-center justify-start p-3 w-32 flex-shrink-0 ${item.stock <= 0 ? 'opacity-50' : ''}">
-                        <img src="https://placehold.co/100x100/1f2937/${bgColor}?text=${placeholder.text.replace(' ', '+')}" 
+                        <!-- Using image from APP_STATE.menu -->
+                        <img src="${item.image}" 
                              onerror="this.src='https://placehold.co/100x100/1f2937/FFFAF0?text=Snack'" 
-                             class="rounded-lg mb-2 border border-gray-700">
+                             alt="${item.name}"
+                             class="w-24 h-24 rounded-lg mb-2 border border-gray-700 object-cover">
                         <span class="text-sm font-semibold text-center leading-tight">${item.name}</span>
                         <span class="text-xs text-gray-400 mb-2">₹${item.price}</span>
                         <button onclick="addToCart('${item.id}')" 
@@ -1675,6 +1761,7 @@ function placeOrder() {
 
             return `
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- User Info Panel -->
                 <div class="canteen-card p-6 lg:col-span-1 h-fit">
                     <div class="flex items-center mb-4 border-b border-gray-700 pb-4">
                         ${getProfileHtml(user)}
@@ -1687,10 +1774,12 @@ function placeOrder() {
                         </div>
                     </div>
                     
+                    <!-- New Animated Token Component -->
                     <div class="token-button-wrapper">
                         <button type="button" class="token-button">
                             <span class="token-fold"></span>
                             <div class="token-points-wrapper">
+                                <!-- Generate floating points with staggered animation -->
                                 ${Array(10).fill(0).map((_, i) => `<i class="point" style="left: ${Math.random() * 100}%; animation-duration: ${1.5 + Math.random()}s; animation-delay: ${Math.random() * 2}s;"></i>`).join('')}
                             </div>
                             <span class="token-inner">
@@ -1700,19 +1789,24 @@ function placeOrder() {
                             </span>
                         </button>
                     </div>
+                    <!-- End Animated Token Component -->
+
                     <div class="bg-red-900/30 p-3 rounded-lg border border-red-700/50 mt-4">
                         <p class="text-sm font-semibold text-red-300">Outstanding Udhar (Dues):</p>
                         <p class="text-xl font-bold text-red-400">₹${APP_STATE.udharLedger[userToken] || 0}</p>
                     </div>
                     
+                    <!-- Pay Later Checkbox -->
                     <div class="mt-4 flex items-center justify-start">
                         <input type="checkbox" id="payLater" class="form-checkbox h-5 w-5 text-red-600 bg-gray-700 border-gray-600 rounded">
                         <label for="payLater" class="ml-2 text-sm font-medium text-gray-300">Allow Pay Later (Udhar)</label>
                     </div>
                 </div>
 
+                <!-- Menu and Cart -->
                 <div class="lg:col-span-2">
                     
+                    <!-- Horizontal Scroll Snacks Section -->
                     <div class="canteen-card p-6 mb-8">
                         <h3 class="text-2xl font-bold mb-4 text-white border-b pb-2 border-gray-700 flex justify-between items-center">
                             Quick Snacks & Wafers
@@ -1723,6 +1817,7 @@ function placeOrder() {
                         </div>
                     </div>
                     
+                    <!-- Cooked Menu Section -->
                     <div class="canteen-card p-6 mb-8">
                         <h3 class="text-2xl font-bold mb-4 text-white border-b pb-2 border-gray-700">Cafeteria Menu (Cooked)</h3>
                         <div id="menu-list">
@@ -1730,13 +1825,15 @@ function placeOrder() {
                         </div>
                     </div>
 
+                    <!-- Cart Section -->
                     <div class="canteen-card p-6">
                         <h3 class="text-2xl font-bold mb-4 flex items-center">
                             <i data-lucide="shopping-cart" class="w-6 h-6 mr-3 text-white"></i>
                             Your Order Cart
                         </h3>
                         <div id="cart-items" class="min-h-[50px] text-center text-gray-500 p-4 border border-dashed border-gray-700 rounded-lg">
-                            </div>
+                            <!-- Cart items rendered here by updateCartUI() -->
+                        </div>
                         <div class="flex justify-between items-center mt-4 pt-4 border-t border-gray-700">
                             <span class="text-xl font-bold">Total: <span id="cart-total" style="color:var(--primary-color);">₹0</span></span>
                             <button onclick="placeOrder()" class="glow-button px-6 py-2 rounded-lg disabled:opacity-30 disabled:shadow-none" id="place-order-btn" disabled>
@@ -1751,8 +1848,6 @@ function placeOrder() {
 
         
 function getOrderRowHtml(o) {
-    // This function is for the deprecated ownerPanel implementation. We will not use it, but keep it for reference to the original file structure.
-    // The owner dashboard now uses renderOwnerDashboard for a cleaner, modern view.
   const lines = [];
   lines.push('<div style=\"border:1px solid #eee;padding:8px;margin-bottom:6px;border-radius:8px;\">');
   lines.push('<div><strong>' + o.id + '</strong> — Token: ' + (o.token||'') + ' — Status: ' + o.status + '</div>');
@@ -1960,6 +2055,7 @@ function renderQueue() {
                     </button>
                 </div>
                 
+                <!-- MOVED LOGOUT INTO A CARD-STYLE BUTTON FOR BETTER VISUAL HIERARCHY -->
                 <button onclick="logout()" class="login-btn w-full py-2 text-sm bg-red-600 hover:bg-red-500" style="--primary-color: #F87171;">
                     <i data-lucide="log-out" class="w-5 h-5 mr-2 inline-block"></i> Logout
                 </button>
@@ -2057,6 +2153,7 @@ function renderQueue() {
                 <h2 class="text-3xl font-bold text-center mb-6 text-white">${user.name}'s Dashboard</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 
+                    <!-- Live Orders -->
                     <div class="canteen-card p-6 lg:col-span-2">
                         <h3 class="text-2xl font-bold mb-4 border-b pb-2 border-gray-700">Live Orders (${liveOrders.length})</h3>
                         <div class="h-96 overflow-y-auto pr-2">
@@ -2064,6 +2161,7 @@ function renderQueue() {
                         </div>
                     </div>
 
+                    <!-- Stock Management -->
                     <div class="canteen-card p-6">
                         <h3 class="text-2xl font-bold mb-4 border-b pb-2 border-gray-700">Stock & Inventory</h3>
                         <div class="h-96 overflow-y-auto pr-2">
@@ -2071,6 +2169,7 @@ function renderQueue() {
                         </div>
                     </div>
 
+                    <!-- Digital Dues Ledger -->
                     <div class="canteen-card p-6 lg:col-span-1">
                         <h3 class="text-2xl font-bold mb-4 border-b pb-2 border-gray-700">Digital Dues Ledger (Udhar)</h3>
                         <div class="h-96 overflow-y-auto pr-2">
@@ -2078,6 +2177,7 @@ function renderQueue() {
                         </div>
                     </div>
                     
+                    <!-- Notification Log -->
                     <div class="canteen-card p-6 lg:col-span-1">
                         <h3 class="text-2xl font-bold mb-4 border-b pb-2 border-gray-700">Payment Notifications</h3>
                         <div class="h-auto max-h-56 overflow-y-auto pr-2">
@@ -2085,6 +2185,7 @@ function renderQueue() {
                         </div>
                     </div>
 
+                    <!-- Cancellation Board -->
                     <div class="canteen-card p-6 lg:col-span-2">
                         <h3 class="text-2xl font-bold mb-4 border-b pb-2 border-gray-700">Cancelled Orders & Items (Recent)</h3>
                         <div class="h-96 overflow-y-auto pr-2">
